@@ -1,0 +1,410 @@
+{% extends 'admin/admim home sub.html' %}
+
+{% block body %}
+
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+
+<style>
+    table.dataTable {
+        border-collapse: collapse !important;
+        width: 100% !important;
+        background: transparent !important;
+    }
+
+    table.dataTable thead th {
+        background-color: #101825 !important;
+        color: #A9B9C7 !important;
+        border-bottom: 1px solid #263444 !important;
+        font-size: 12px !important;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        padding: 14px 16px !important;
+    }
+
+    table.dataTable tbody td {
+        padding: 13px 16px !important;
+        border-bottom: 1px solid #26344440 !important;
+        color: #A9B9C7 !important;
+        background-color: transparent !important;
+    }
+
+    table.dataTable tbody tr:hover td {
+        background-color: #1A2535 !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter input {
+        background: #101825 !important;
+        border: 1px solid #263444 !important;
+        color: #E8EDF2 !important;
+        border-radius: 8px !important;
+        padding: 7px 12px !important;
+        outline: none !important;
+    }
+
+    .dataTables_wrapper .dataTables_filter input:focus {
+        border-color: #3FC7B0 !important;
+    }
+
+    .dataTables_wrapper .dataTables_length select {
+        background: #101825 !important;
+        border: 1px solid #263444 !important;
+        color: #E8EDF2 !important;
+        border-radius: 6px !important;
+        padding: 4px 8px !important;
+    }
+
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_length label,
+    .dataTables_wrapper .dataTables_filter label {
+        color: #7E93A7 !important;
+        font-size: 13px !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: #A9B9C7 !important;
+        background: transparent !important;
+        border: 1px solid transparent !important;
+        border-radius: 6px !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #3FC7B01a !important;
+        color: #3FC7B0 !important;
+        border: 1px solid #3FC7B040 !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #1A2535 !important;
+        color: #E8EDF2 !important;
+        border: 1px solid #263444 !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+        color: #4A5A6A !important;
+    }
+
+    .url-cell {
+        max-width: 280px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .confidence-safe {
+        color: #3FC7B0 !important;
+        font-weight: 600;
+    }
+
+    .confidence-danger {
+        color: #FF9DA0 !important;
+        font-weight: 600;
+    }
+
+    .prediction-danger {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        background-color: #E5484D1a;
+        color: #FF9DA0;
+        border: 1px solid #E5484D40;
+    }
+
+    .prediction-safe {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        background-color: #3FC7B01a;
+        color: #3FC7B0;
+        border: 1px solid #3FC7B040;
+    }
+</style>
+
+
+<div style="
+    min-height:85vh;
+    width:100%;
+    padding:40px 20px;
+    box-sizing:border-box;
+    background-color:#0D1420;
+    font-family:'Sora', system-ui, sans-serif;
+">
+
+    <div style="max-width:1200px; margin:0 auto;">
+
+        <!-- PAGE HEADER -->
+        <div style="
+            display:flex;
+            align-items:center;
+            gap:14px;
+            margin-bottom:28px;
+        ">
+
+            <div style="
+                width:48px;
+                height:48px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                background-color:#E5484D1a;
+                border:1px solid #E5484D40;
+                border-radius:12px;
+            ">
+
+                <svg width="22"
+                     height="22"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     stroke="#FF9DA0"
+                     stroke-width="1.8"
+                     stroke-linecap="round"
+                     stroke-linejoin="round">
+
+                    <path d="
+                        M10.29 3.86
+                        L1.82 18
+                        a2 2 0 0 0 1.71 3
+                        h16.94
+                        a2 2 0 0 0 1.71-3
+                        L13.71 3.86
+                        a2 2 0 0 0-3.42 0z
+                    "/>
+
+                    <line x1="12" y1="9" x2="12" y2="13"/>
+                    <line x1="12" y1="17" x2="12.01" y2="17"/>
+
+                </svg>
+
+            </div>
+
+            <div>
+
+                <h2 style="
+                    margin:0;
+                    font-size:22px;
+                    font-weight:700;
+                    color:#E8EDF2;
+                ">
+                    Phishing Detection Logs
+                </h2>
+
+                <p style="
+                    margin:3px 0 0 0;
+                    font-size:13px;
+                    color:#7E93A7;
+                ">
+                    URL phishing detection results
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- TABLE CONTAINER -->
+        <div style="
+            background-color:#141E2B;
+            border:1px solid #26344450;
+            border-radius:14px;
+            overflow:hidden;
+            box-shadow:0 8px 24px rgba(0,0,0,0.35);
+            padding:20px;
+        ">
+
+            <table id="phishingTable"
+                   class="display"
+                   style="width:100%;">
+
+                <thead>
+
+                    <tr>
+                        <th>#</th>
+                        <th>User</th>
+                        <th>URL</th>
+                        <th>Probability</th>
+                        <th>Prediction</th>
+                        <th>Date</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for log in logs %}
+
+                    <tr>
+
+                        <!-- SERIAL NUMBER -->
+                        <td style="color:#7E93A7;">
+                            {{ forloop.counter }}
+                        </td>
+
+
+                        <!-- USER -->
+                        <td style="
+                            color:#E8EDF2;
+                            font-weight:500;
+                        ">
+
+                            {{ log.USER.name }}
+
+                            <br>
+
+                            <small style="color:#7E93A7;">
+                                {{ log.USER.LOGIN.username }}
+                            </small>
+
+                        </td>
+
+
+                        <!-- URL -->
+                        <td class="url-cell"
+                            title="{{ log.url }}"
+                            style="color:#E8EDF2;">
+
+                            {{ log.url|truncatechars:45 }}
+
+                        </td>
+
+
+                        <!-- PROBABILITY -->
+                        <td>
+
+                            {% if log.probability >= 0.70 %}
+
+                                <span class="confidence-danger">
+                                    {{ log.probability|floatformat:2 }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="confidence-safe">
+                                    {{ log.probability|floatformat:2 }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- PREDICTION -->
+                        <td>
+
+                            {% if 'phish' in log.result|lower or 'malicious' in log.result|lower or 'danger' in log.result|lower %}
+
+                                <span class="prediction-danger">
+                                    {{ log.result|truncatechars:25 }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="prediction-safe">
+                                    {{ log.result|truncatechars:25 }}
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- DATE -->
+                        <td style="
+                            color:#7E93A7;
+                            white-space:nowrap;
+                        ">
+
+                            {{ log.created_at|date:"d M Y, H:i" }}
+
+                        </td>
+
+                    </tr>
+
+
+                    {% empty %}
+
+                    <tr>
+
+                        <td colspan="6"
+                            style="
+                                text-align:center;
+                                padding:50px;
+                                color:#7E93A7;
+                            ">
+
+                            No phishing detection logs found.
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- JQUERY -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- DATATABLE -->
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function () {
+
+    try {
+
+        if ($.fn.DataTable) {
+
+            $('#phishingTable').DataTable({
+
+                pageLength: 10,
+
+                lengthMenu: [5, 10, 25, 50],
+
+                order: [[0, 'asc']],
+
+                language: {
+
+                    search: "Search:",
+
+                    lengthMenu: "Show _MENU_ entries",
+
+                    info: "Showing _START_ to _END_ of _TOTAL_ logs",
+
+                    zeroRecords: "No matching logs found"
+
+                }
+
+            });
+
+        }
+
+    }
+
+    catch (e) {
+
+        console.log(e);
+
+    }
+
+});
+
+</script>
+
+
+{% endblock %}

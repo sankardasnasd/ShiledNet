@@ -1,0 +1,262 @@
+{% extends 'user/userhome.html' %}
+{% block body %}
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+
+<style>
+    table.dataTable { border-collapse: collapse !important; width: 100% !important; background: transparent !important; }
+    table.dataTable thead th {
+        background-color: #101825 !important; color: #A9B9C7 !important;
+        border-bottom: 1px solid #263444 !important; font-size: 12px !important;
+        text-transform: uppercase; letter-spacing: 0.04em; padding: 14px 16px !important;
+    }
+    table.dataTable tbody td {
+        padding: 13px 16px !important; border-bottom: 1px solid #26344440 !important;
+        color: #A9B9C7 !important; background-color: transparent !important;
+    }
+    table.dataTable tbody tr:hover td { background-color: #1A2535 !important; }
+    .dataTables_wrapper .dataTables_filter input {
+        background: #101825 !important; border: 1px solid #263444 !important;
+        color: #E8EDF2 !important; border-radius: 8px !important; padding: 7px 12px !important; outline: none !important;
+    }
+    .dataTables_wrapper .dataTables_filter input:focus { border-color: #3FC7B0 !important; }
+    .dataTables_wrapper .dataTables_length select {
+        background: #101825 !important; border: 1px solid #263444 !important;
+        color: #E8EDF2 !important; border-radius: 6px !important; padding: 4px 8px !important;
+    }
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_length label,
+    .dataTables_wrapper .dataTables_filter label { color: #7E93A7 !important; font-size: 13px !important; }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: #A9B9C7 !important; background: transparent !important;
+        border: 1px solid transparent !important; border-radius: 6px !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #3FC7B01a !important; color: #3FC7B0 !important; border: 1px solid #3FC7B040 !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #1A2535 !important; color: #E8EDF2 !important; border: 1px solid #263444 !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled { color: #4A5A6A !important; }
+
+    /* Star rating */
+    .star-rating { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 6px; }
+    .star-rating input { display: none; }
+    .star-rating label {
+        font-size: 28px; color: #263444; cursor: pointer; transition: color 0.2s;
+    }
+    .star-rating input:checked ~ label,
+    .star-rating label:hover,
+    .star-rating label:hover ~ label { color: #3FC7B0; }
+</style>
+
+<div style="min-height:85vh; width:100%; padding:40px 20px; box-sizing:border-box; background-color:#0D1420; font-family:'Sora', system-ui, -apple-system, sans-serif;">
+
+    <div style="max-width:1100px; margin:0 auto;">
+
+        <!-- Header -->
+        <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; margin-bottom:28px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+                <div style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; background-color:#3FC7B01a; border:1px solid #3FC7B040; border-radius:12px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3FC7B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 style="margin:0; font-size:22px; font-weight:700; color:#E8EDF2; letter-spacing:-0.02em;">My Feedback</h2>
+                    <p style="margin:3px 0 0 0; font-size:13px; color:#7E93A7;">Share your experience and view previous feedback</p>
+                </div>
+            </div>
+
+            <button type="button" id="openFeedbackModal" style="
+                display:flex; align-items:center; gap:8px; height:44px; padding:0 20px;
+                background:#3FC7B0; border:none; border-radius:10px; color:#06231D;
+                font-size:14px; font-weight:600; cursor:pointer;
+            ">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+                Send Feedback
+            </button>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div style="
+                    width:100%; box-sizing:border-box; margin-bottom:20px; padding:12px 16px;
+                    background-color:{% if 'success' in message.tags %}#3FC7B018{% else %}#E5484D18{% endif %};
+                    border:1px solid {% if 'success' in message.tags %}#3FC7B040{% else %}#E5484D40{% endif %};
+                    color:{% if 'success' in message.tags %}#3FC7B0{% else %}#FF9DA0{% endif %};
+                    border-radius:10px; font-size:13px;
+                ">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Table -->
+        <div style="background-color:#141E2B; border:1px solid #26344450; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35); padding:20px;">
+            <table id="feedbackTable" class="display" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Rating</th>
+                        <th>Feedback</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in feedbacks %}
+                    <tr>
+                        <td style="color:#7E93A7;">{{ forloop.counter }}</td>
+                        <td>
+                            <span style="color:#3FC7B0; font-weight:600; letter-spacing:1px;">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= f.rating|add:0 %}★{% else %}☆{% endif %}
+                                {% endfor %}
+                            </span>
+                            <small style="color:#7E93A7; margin-left:6px;">({{ f.rating }}/5)</small>
+                        </td>
+                        <td style="color:#A9B9C7;" title="{{ f.feedback }}">{{ f.feedback|truncatechars:80 }}</td>
+                        <td style="color:#7E93A7; white-space:nowrap;">{{ f.created_at|date:"d M Y, H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="text-align:center; padding:40px; color:#7E93A7;">No feedback submitted yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+<!-- ==================== FEEDBACK MODAL ==================== -->
+<div id="feedbackModal" style="
+    display:none; position:fixed; top:0; left:0; right:0; bottom:0;
+    z-index:99999; background:rgba(0,0,0,0.7);
+    align-items:center; justify-content:center; padding:20px;
+">
+    <div style="
+        width:100%; max-width:480px; background:#141E2B;
+        border:1px solid #263444; border-radius:16px;
+        box-shadow:0 25px 50px rgba(0,0,0,0.5); overflow:hidden;
+    ">
+        <!-- Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:18px 22px; border-bottom:1px solid #263444;">
+            <h3 style="margin:0; font-size:18px; font-weight:700; color:#E8EDF2;">Send Feedback</h3>
+            <button type="button" id="closeFeedbackModal" style="
+                width:34px; height:34px; display:flex; align-items:center; justify-content:center;
+                background:transparent; border:1px solid #263444; border-radius:8px;
+                color:#7E93A7; cursor:pointer; font-size:18px;
+            ">×</button>
+        </div>
+
+        <!-- Body -->
+        <form method="POST" action="/myapp/user_view_and_send_feedback/" style="padding:22px;">
+            {% csrf_token %}
+
+            <!-- Rating -->
+            <div style="margin-bottom:20px;">
+                <label style="display:block; font-size:13px; font-weight:600; color:#A9B9C7; margin-bottom:10px;">Rating</label>
+                <div class="star-rating">
+                    <input type="radio" id="star5" name="rating" value="5" required><label for="star5">★</label>
+                    <input type="radio" id="star4" name="rating" value="4"><label for="star4">★</label>
+                    <input type="radio" id="star3" name="rating" value="3"><label for="star3">★</label>
+                    <input type="radio" id="star2" name="rating" value="2"><label for="star2">★</label>
+                    <input type="radio" id="star1" name="rating" value="1"><label for="star1">★</label>
+                </div>
+            </div>
+
+            <!-- Feedback text -->
+            <div style="margin-bottom:24px;">
+                <label style="display:block; font-size:13px; font-weight:600; color:#A9B9C7; margin-bottom:7px;">Your Feedback</label>
+                <textarea name="feedback" required rows="5" placeholder="Tell us about your experience..."
+                    style="
+                        width:100%; box-sizing:border-box; resize:vertical;
+                        background:#101825; border:1px solid #263444; border-radius:9px;
+                        outline:none; color:#E8EDF2; font-size:14px; padding:12px 14px;
+                        font-family:inherit;
+                    "></textarea>
+            </div>
+
+            <!-- Buttons -->
+            <div style="display:flex; gap:12px;">
+                <button type="button" id="cancelFeedbackModal" style="
+                    flex:1; height:44px; background:transparent; border:1px solid #263444;
+                    border-radius:9px; color:#A9B9C7; font-size:14px; font-weight:600; cursor:pointer;
+                ">Cancel</button>
+
+                <button type="submit" style="
+                    flex:1; height:44px; background:#3FC7B0; border:none; border-radius:9px;
+                    color:#06231D; font-size:14px; font-weight:600; cursor:pointer;
+                ">Submit Feedback</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // DataTable
+    try {
+        if ($.fn.DataTable) {
+            if ($.fn.DataTable.isDataTable('#feedbackTable')) {
+                $('#feedbackTable').DataTable().destroy();
+            }
+            $('#feedbackTable').DataTable({
+                pageLength: 8,
+                lengthMenu: [5, 8, 10, 25],
+                order: [[0, 'asc']],
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ feedbacks",
+                    infoEmpty: "No feedback available",
+                    zeroRecords: "No matching feedback found"
+                }
+            });
+        }
+    } catch (e) {
+        console.log('DataTables error:', e);
+    }
+
+    // Modal controls
+    const modal = document.getElementById('feedbackModal');
+    const openBtn = document.getElementById('openFeedbackModal');
+    const closeBtn = document.getElementById('closeFeedbackModal');
+    const cancelBtn = document.getElementById('cancelFeedbackModal');
+
+    function openModal() {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+    function closeModal() {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }
+
+    if (openBtn) openBtn.addEventListener('click', openModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) closeModal();
+    });
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeModal();
+    });
+});
+</script>
+
+{% endblock %}

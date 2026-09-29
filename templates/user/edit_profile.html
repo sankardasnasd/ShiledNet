@@ -1,0 +1,89 @@
+{% extends 'user/userhome.html' %}
+{% block body %}
+
+<div style="min-height:85vh; width:100%; padding:40px 20px; box-sizing:border-box; background-color:#0D1420; font-family:'Sora', system-ui, sans-serif;">
+
+    <div style="max-width:600px; margin:0 auto;">
+
+        <!-- Header -->
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:28px;">
+            <div style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; background-color:#3FC7B01a; border:1px solid #3FC7B040; border-radius:12px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3FC7B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+            </div>
+            <div>
+                <h2 style="margin:0; font-size:22px; font-weight:700; color:#E8EDF2;">Edit Profile</h2>
+                <p style="margin:3px 0 0 0; font-size:13px; color:#7E93A7;">Update your personal information</p>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div style="
+                    width:100%; box-sizing:border-box; margin-bottom:20px; padding:12px 16px;
+                    background-color:{% if 'success' in message.tags %}#3FC7B018{% else %}#E5484D18{% endif %};
+                    border:1px solid {% if 'success' in message.tags %}#3FC7B040{% else %}#E5484D40{% endif %};
+                    color:{% if 'success' in message.tags %}#3FC7B0{% else %}#FF9DA0{% endif %};
+                    border-radius:10px; font-size:13px;
+                ">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Form Card -->
+        <div style="background-color:#141E2B; border:1px solid #26344450; border-radius:14px; padding:28px; box-shadow:0 8px 24px rgba(0,0,0,0.35);">
+
+            <form method="POST" action="/myapp/user_edit_profile/">
+                {% csrf_token %}
+
+                <!-- Full Name -->
+                <div style="margin-bottom:18px;">
+                    <label style="display:block; font-size:13px; font-weight:600; color:#A9B9C7; margin-bottom:7px;">Full Name</label>
+                    <input type="text" name="name" value="{{ profile.name }}" required
+                        style="width:100%; height:44px; box-sizing:border-box; background:#101825; border:1px solid #263444; border-radius:9px; outline:none; color:#E8EDF2; font-size:14px; padding:0 14px;">
+                </div>
+
+                <!-- Email -->
+                <div style="margin-bottom:18px;">
+                    <label style="display:block; font-size:13px; font-weight:600; color:#A9B9C7; margin-bottom:7px;">Email</label>
+                    <input type="email" name="email" value="{{ profile.LOGIN.email }}" required
+                        style="width:100%; height:44px; box-sizing:border-box; background:#101825; border:1px solid #263444; border-radius:9px; outline:none; color:#E8EDF2; font-size:14px; padding:0 14px;">
+                </div>
+
+                <!-- Phone -->
+                <div style="margin-bottom:18px;">
+                    <label style="display:block; font-size:13px; font-weight:600; color:#A9B9C7; margin-bottom:7px;">Phone Number</label>
+                    <input type="text" name="phone" value="{{ profile.phone }}" required maxlength="10"
+                        style="width:100%; height:44px; box-sizing:border-box; background:#101825; border:1px solid #263444; border-radius:9px; outline:none; color:#E8EDF2; font-size:14px; padding:0 14px;">
+                </div>
+
+                <!-- Address -->
+                <div style="margin-bottom:24px;">
+                    <label style="display:block; font-size:13px; font-weight:600; color:#A9B9C7; margin-bottom:7px;">Address</label>
+                    <input type="text" name="Adress" value="{{ profile.Adress }}" required
+                        style="width:100%; height:44px; box-sizing:border-box; background:#101825; border:1px solid #263444; border-radius:9px; outline:none; color:#E8EDF2; font-size:14px; padding:0 14px;">
+                </div>
+
+                <!-- Buttons -->
+                <div style="display:flex; gap:12px;">
+                    <a href="/myapp/user_view_profile/" style="
+                        flex:1; height:46px; display:flex; align-items:center; justify-content:center;
+                        background:transparent; border:1px solid #263444; border-radius:9px;
+                        color:#A9B9C7; font-size:14px; font-weight:600; text-decoration:none;
+                    ">Cancel</a>
+
+                    <button type="submit" style="
+                        flex:1; height:46px; background:#3FC7B0; border:none; border-radius:9px;
+                        color:#06231D; font-size:14px; font-weight:600; cursor:pointer;
+                    ">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

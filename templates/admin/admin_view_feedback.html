@@ -1,0 +1,141 @@
+{% extends 'admin/admim home sub.html' %}
+{% block body %}
+
+<!-- DataTables CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+
+<style>
+    table.dataTable { border-collapse: collapse !important; width: 100% !important; background: transparent !important; }
+    table.dataTable thead th {
+        background-color: #101825 !important; color: #A9B9C7 !important;
+        border-bottom: 1px solid #263444 !important; font-size: 12px !important;
+        text-transform: uppercase; letter-spacing: 0.04em; padding: 14px 16px !important;
+    }
+    table.dataTable tbody td {
+        padding: 13px 16px !important; border-bottom: 1px solid #26344440 !important;
+        color: #A9B9C7 !important; background-color: transparent !important;
+    }
+    table.dataTable tbody tr:hover td { background-color: #1A2535 !important; }
+    .dataTables_wrapper .dataTables_filter input {
+        background: #101825 !important; border: 1px solid #263444 !important;
+        color: #E8EDF2 !important; border-radius: 8px !important; padding: 7px 12px !important; outline: none !important;
+    }
+    .dataTables_wrapper .dataTables_filter input:focus { border-color: #3FC7B0 !important; }
+    .dataTables_wrapper .dataTables_length select {
+        background: #101825 !important; border: 1px solid #263444 !important;
+        color: #E8EDF2 !important; border-radius: 6px !important; padding: 4px 8px !important;
+    }
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_length label,
+    .dataTables_wrapper .dataTables_filter label { color: #7E93A7 !important; font-size: 13px !important; }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: #A9B9C7 !important; background: transparent !important;
+        border: 1px solid transparent !important; border-radius: 6px !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #3FC7B01a !important; color: #3FC7B0 !important; border: 1px solid #3FC7B040 !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #1A2535 !important; color: #E8EDF2 !important; border: 1px solid #263444 !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled { color: #4A5A6A !important; }
+</style>
+
+<div style="min-height:85vh; width:100%; padding:40px 20px; box-sizing:border-box; background-color:#0D1420; font-family:'Sora', system-ui, -apple-system, sans-serif;">
+
+    <div style="max-width:1200px; margin:0 auto;">
+
+        <!-- Header -->
+        <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:16px; margin-bottom:28px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+                <div style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; background-color:#3FC7B01a; border:1px solid #3FC7B040; border-radius:12px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3FC7B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 style="margin:0; font-size:22px; font-weight:700; color:#E8EDF2; letter-spacing:-0.02em;">User Feedback</h2>
+                    <p style="margin:3px 0 0 0; font-size:13px; color:#7E93A7;">View all feedback submitted by users</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div style="background-color:#141E2B; border:1px solid #26344450; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35); padding:20px;">
+            <table id="feedbackTable" class="display" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>User</th>
+                        <th>Rating</th>
+                        <th>Feedback</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for f in feedbacks %}
+                    <tr>
+                        <td style="color:#7E93A7;">{{ forloop.counter }}</td>
+                        <td style="color:#E8EDF2; font-weight:500;">
+                            {{ f.USER.name }}<br>
+                            <small style="color:#7E93A7;">{{ f.USER.LOGIN.username }}</small>
+                        </td>
+                        <td>
+                            <span style="color:#3FC7B0; font-weight:600; letter-spacing:1px; font-size:15px;">
+                                {% with rating=f.rating|add:0 %}
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= rating %}★{% else %}<span style="color:#263444;">☆</span>{% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                            </span>
+                            <small style="color:#7E93A7; margin-left:6px;">({{ f.rating }}/5)</small>
+                        </td>
+                        <td style="color:#A9B9C7; max-width:320px;" title="{{ f.feedback }}">
+                            {{ f.feedback|truncatechars:90 }}
+                        </td>
+                        <td style="color:#7E93A7; white-space:nowrap;">{{ f.created_at|date:"d M Y, H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align:center; padding:50px; color:#7E93A7;">
+                            No feedback submitted yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    try {
+        if ($.fn.DataTable) {
+            if ($.fn.DataTable.isDataTable('#feedbackTable')) {
+                $('#feedbackTable').DataTable().destroy();
+            }
+            $('#feedbackTable').DataTable({
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                order: [[0, 'asc']],
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ feedbacks",
+                    infoEmpty: "No feedback available",
+                    zeroRecords: "No matching feedback found"
+                }
+            });
+        }
+    } catch (e) {
+        console.log('DataTables error:', e);
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'admin/admim home sub.html' %}
+{% block body %}
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+<style>
+    table.dataTable { border-collapse: collapse !important; width: 100% !important; background: transparent !important; }
+    table.dataTable thead th {
+        background-color: #101825 !important; color: #A9B9C7 !important;
+        border-bottom: 1px solid #263444 !important; font-size: 12px !important;
+        text-transform: uppercase; letter-spacing: 0.04em; padding: 14px 16px !important;
+    }
+    table.dataTable tbody td {
+        padding: 13px 16px !important; border-bottom: 1px solid #26344440 !important;
+        color: #A9B9C7 !important; background-color: transparent !important;
+    }
+    table.dataTable tbody tr:hover td { background-color: #1A2535 !important; }
+    .dataTables_wrapper .dataTables_filter input {
+        background: #101825 !important; border: 1px solid #263444 !important;
+        color: #E8EDF2 !important; border-radius: 8px !important; padding: 7px 12px !important; outline: none !important;
+    }
+    .dataTables_wrapper .dataTables_filter input:focus { border-color: #3FC7B0 !important; }
+    .dataTables_wrapper .dataTables_length select {
+        background: #101825 !important; border: 1px solid #263444 !important;
+        color: #E8EDF2 !important; border-radius: 6px !important; padding: 4px 8px !important;
+    }
+    .dataTables_wrapper .dataTables_info,
+    .dataTables_wrapper .dataTables_length label,
+    .dataTables_wrapper .dataTables_filter label { color: #7E93A7 !important; font-size: 13px !important; }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        color: #A9B9C7 !important; background: transparent !important;
+        border: 1px solid transparent !important; border-radius: 6px !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+        background: #3FC7B01a !important; color: #3FC7B0 !important; border: 1px solid #3FC7B040 !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+        background: #1A2535 !important; color: #E8EDF2 !important; border: 1px solid #263444 !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled { color: #4A5A6A !important; }
+</style>
+
+<div style="min-height:85vh; width:100%; padding:40px 20px; box-sizing:border-box; background-color:#0D1420; font-family:'Sora', system-ui, sans-serif;">
+    <div style="max-width:1200px; margin:0 auto;">
+
+        <div style="display:flex; align-items:center; gap:14px; margin-bottom:28px;">
+            <div style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; background-color:#3FC7B01a; border:1px solid #3FC7B040; border-radius:12px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3FC7B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+            </div>
+            <div>
+                <h2 style="margin:0; font-size:22px; font-weight:700; color:#E8EDF2;">Network Scan Logs</h2>
+                <p style="margin:3px 0 0 0; font-size:13px; color:#7E93A7;">All network scan activities performed by users</p>
+            </div>
+        </div>
+
+        <div style="background-color:#141E2B; border:1px solid #26344450; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35); padding:20px;">
+            <table id="networkTable" class="display" style="width:100%;">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>User</th>
+                        <th>Target Host</th>
+                        <th>Status</th>
+                        <th>Scan Result</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td style="color:#7E93A7;">{{ forloop.counter }}</td>
+                        <td style="color:#E8EDF2; font-weight:500;">
+                            {{ log.USER.name }}<br>
+                            <small style="color:#7E93A7;">{{ log.USER.LOGIN.username }}</small>
+                        </td>
+                        <td style="color:#E8EDF2;">{{ log.target_host }}</td>
+                        <td>
+                            {% if log.status|lower == 'completed' or log.status|lower == 'success' %}
+                                <span style="display:inline-block; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600; background-color:#3FC7B01a; color:#3FC7B0; border:1px solid #3FC7B040;">{{ log.status }}</span>
+                            {% else %}
+                                <span style="display:inline-block; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600; background-color:#E5484D1a; color:#FF9DA0; border:1px solid #E5484D40;">{{ log.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td style="color:#A9B9C7; max-width:280px;" title="{{ log.scanresult }}">
+                            {{ log.scanresult|truncatechars:70 }}
+                        </td>
+                        <td style="color:#7E93A7; white-space:nowrap;">{{ log.timestamp|date:"d M Y, H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align:center; padding:50px; color:#7E93A7;">No network scan logs found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    try {
+        if ($.fn.DataTable) {
+            $('#networkTable').DataTable({
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                order: [[0, 'asc']],
+                language: {
+                    search: "Search:",
+                    lengthMenu: "Show _MENU_ entries",
+                    info: "Showing _START_ to _END_ of _TOTAL_ logs",
+                    zeroRecords: "No matching logs found"
+                }
+            });
+        }
+    } catch (e) { console.log(e); }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,96 @@
+{% extends 'user/userhome.html' %}
+{% block body %}
+
+<div style="min-height:85vh; width:100%; padding:40px 20px; box-sizing:border-box; background-color:#0D1420; font-family:'Sora', system-ui, sans-serif;">
+
+    <div style="max-width:700px; margin:0 auto;">
+
+        <!-- Header -->
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:16px;">
+            <div style="display:flex; align-items:center; gap:14px;">
+                <div style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; background-color:#3FC7B01a; border:1px solid #3FC7B040; border-radius:12px;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3FC7B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 style="margin:0; font-size:22px; font-weight:700; color:#E8EDF2;">My Profile</h2>
+                    <p style="margin:3px 0 0 0; font-size:13px; color:#7E93A7;">View your account details</p>
+                </div>
+            </div>
+
+            <a href="/myapp/user_edit_profile/#a" style="
+                display:inline-flex; align-items:center; gap:8px; height:42px; padding:0 18px;
+                background:#3FC7B0; border-radius:9px; color:#06231D; font-size:14px; font-weight:600; text-decoration:none;
+            ">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+                Edit Profile
+            </a>
+        </div>
+
+        <!-- Profile Card -->
+        <div style="background-color:#141E2B; border:1px solid #26344450; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(0,0,0,0.35);">
+
+            <!-- Top banner -->
+            <div style="height:90px; background:linear-gradient(135deg, #3FC7B030, #101825);"></div>
+
+            <div style="padding:0 28px 28px 28px; margin-top:-40px;">
+                <!-- Avatar -->
+                <div style="
+                    width:80px; height:80px; border-radius:50%;
+                    background:#3FC7B0; color:#06231D;
+                    display:flex; align-items:center; justify-content:center;
+                    font-size:28px; font-weight:700;
+                    border:4px solid #141E2B;
+                    margin-bottom:18px;
+                ">
+                    {{ profile.name|first|upper }}
+                </div>
+
+                <h3 style="margin:0 0 4px 0; font-size:22px; font-weight:700; color:#E8EDF2;">{{ profile.name }}</h3>
+                <p style="margin:0 0 24px 0; font-size:14px; color:#7E93A7;">@{{ profile.LOGIN.username }}</p>
+
+                <!-- Details Grid -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+
+                    <div style="background:#101825; border:1px solid #263444; border-radius:10px; padding:14px 16px;">
+                        <div style="font-size:12px; color:#7E93A7; margin-bottom:4px;">Email</div>
+                        <div style="font-size:14px; color:#E8EDF2; font-weight:500;">{{ profile.LOGIN.email }}</div>
+                    </div>
+
+                    <div style="background:#101825; border:1px solid #263444; border-radius:10px; padding:14px 16px;">
+                        <div style="font-size:12px; color:#7E93A7; margin-bottom:4px;">Phone</div>
+                        <div style="font-size:14px; color:#E8EDF2; font-weight:500;">{{ profile.phone }}</div>
+                    </div>
+
+                    <div style="background:#101825; border:1px solid #263444; border-radius:10px; padding:14px 16px; grid-column:1 / -1;">
+                        <div style="font-size:12px; color:#7E93A7; margin-bottom:4px;">Address</div>
+                        <div style="font-size:14px; color:#E8EDF2; font-weight:500;">{{ profile.Adress }}</div>
+                    </div>
+
+                    <div style="background:#101825; border:1px solid #263444; border-radius:10px; padding:14px 16px;">
+                        <div style="font-size:12px; color:#7E93A7; margin-bottom:4px;">Status</div>
+                        <div>
+                            {% if profile.status == 'Active' %}
+                                <span style="display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; background-color:#3FC7B01a; color:#3FC7B0; border:1px solid #3FC7B040;">Active</span>
+                            {% else %}
+                                <span style="display:inline-block; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:600; background-color:#E5484D1a; color:#FF9DA0; border:1px solid #E5484D40;">{{ profile.status }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div style="background:#101825; border:1px solid #263444; border-radius:10px; padding:14px 16px;">
+                        <div style="font-size:12px; color:#7E93A7; margin-bottom:4px;">Username</div>
+                        <div style="font-size:14px; color:#E8EDF2; font-weight:500;">{{ profile.LOGIN.username }}</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

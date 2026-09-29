@@ -1,0 +1,287 @@
+{% extends 'user/userhome.html' %}
+{% block body %}
+
+<div style="
+    min-height: 85vh;
+    width: 100%;
+    padding: 40px 20px;
+    box-sizing: border-box;
+    background-color: #0D1420;
+    font-family: 'Sora', system-ui, -apple-system, sans-serif;
+">
+
+    <div style="max-width: 900px; margin: 0 auto;">
+
+        <!-- Header -->
+        <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 28px;">
+            <div style="
+                width: 48px; height: 48px;
+                display: flex; align-items: center; justify-content: center;
+                background-color: #E5484D1a;
+                border: 1px solid #E5484D40;
+                border-radius: 12px;
+            ">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF9DA0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                    <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+                </svg>
+            </div>
+            <div>
+                <h2 style="margin: 0; font-size: 22px; font-weight: 700; color: #E8EDF2;">Phishing URL Detection</h2>
+                <p style="margin: 3px 0 0 0; font-size: 13px; color: #7E93A7;">
+                    Enter a website URL and ShieldNet's machine learning model will analyse it
+                </p>
+            </div>
+        </div>
+
+
+        <!-- Main Card -->
+        <div style="
+            background-color: #141E2B;
+            border: 1px solid #26344450;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+        ">
+
+            <!-- Form Section -->
+            <div style="padding: 28px;">
+
+                <form method="POST" action="/myapp/phishing-check/">
+                    {% csrf_token %}
+
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #A9B9C7; margin-bottom: 8px;">
+                        Enter URL
+                    </label>
+
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                        <input
+                            type="text"
+                            name="url"
+                            value="{{ url|default:'https://' }}"
+                            placeholder="https://example.com"
+                            required
+                            style="
+                                flex: 1;
+                                min-width: 260px;
+                                height: 48px;
+                                box-sizing: border-box;
+                                background: #101825;
+                                border: 1px solid #263444;
+                                border-radius: 10px;
+                                outline: none;
+                                color: #E8EDF2;
+                                font-size: 15px;
+                                padding: 0 16px;
+                            "
+                        >
+
+                        <button type="submit" style="
+                            height: 48px;
+                            padding: 0 28px;
+                            background: #3FC7B0;
+                            border: none;
+                            border-radius: 10px;
+                            color: #06231D;
+                            font-size: 15px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            display: flex;
+                            align-items: center;
+                            gap: 8px;
+                            white-space: nowrap;
+                        ">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                            </svg>
+                            Check URL
+                        </button>
+                    </div>
+                </form>
+
+
+                <!-- Error -->
+                {% if error %}
+                <div style="
+                    margin-top: 20px;
+                    padding: 14px 16px;
+                    background: #E5484D18;
+                    border: 1px solid #E5484D40;
+                    border-radius: 10px;
+                    color: #FF9DA0;
+                    font-size: 14px;
+                ">
+                    <strong>Error:</strong> {{ error }}
+                </div>
+                {% endif %}
+
+
+                <!-- ===================== PHISHING RESULT ===================== -->
+                {% if result == "PHISHING" %}
+                <div style="
+                    margin-top: 28px;
+                    padding: 28px;
+                    background: #E5484D12;
+                    border: 1px solid #E5484D40;
+                    border-radius: 14px;
+                ">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <div style="font-size: 42px; margin-bottom: 8px;">⚠️</div>
+                        <div style="font-size: 26px; font-weight: 700; color: #FF9DA0;">PHISHING URL</div>
+                        <p style="margin: 8px 0 0 0; color: #A9B9C7; font-size: 14px;">
+                            ShieldNet's ML model classified this URL as potentially phishing.
+                        </p>
+                    </div>
+
+                    <!-- Checked URL -->
+                    <div style="margin-bottom: 22px;">
+                        <div style="font-size: 12px; color: #7E93A7; margin-bottom: 6px; font-weight: 600;">Checked URL</div>
+                        <div style="
+                            background: #101825;
+                            border: 1px solid #263444;
+                            border-radius: 9px;
+                            padding: 12px 16px;
+                            color: #E8EDF2;
+                            font-size: 14px;
+                            word-break: break-all;
+                        ">
+                            {{ url }}
+                        </div>
+                    </div>
+
+                    <!-- Phishing Probability -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;">
+                            <span style="color: #A9B9C7;">Phishing Probability</span>
+                            <strong style="color: #FF9DA0;">{{ phishing_probability }}%</strong>
+                        </div>
+                        <div style="height: 10px; background: #101825; border-radius: 20px; overflow: hidden;">
+                            <div style="height: 100%; width: {{ phishing_probability }}%; background: #E5484D; border-radius: 20px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Legitimate Probability -->
+                    <div style="margin-bottom: 22px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;">
+                            <span style="color: #A9B9C7;">Legitimate Probability</span>
+                            <strong style="color: #3FC7B0;">{{ legitimate_probability }}%</strong>
+                        </div>
+                        <div style="height: 10px; background: #101825; border-radius: 20px; overflow: hidden;">
+                            <div style="height: 100%; width: {{ legitimate_probability }}%; background: #3FC7B0; border-radius: 20px;"></div>
+                        </div>
+                    </div>
+
+                    <div style="
+                        padding: 14px 16px;
+                        background: #E5484D18;
+                        border: 1px solid #E5484D30;
+                        border-radius: 9px;
+                        color: #FF9DA0;
+                        font-size: 13px;
+                    ">
+                        <strong>Security Notice:</strong>
+                        Do not enter passwords, banking details, OTPs or other sensitive information into suspicious websites.
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- ===================== LEGITIMATE RESULT ===================== -->
+                {% if result == "LEGITIMATE" %}
+                <div style="
+                    margin-top: 28px;
+                    padding: 28px;
+                    background: #3FC7B012;
+                    border: 1px solid #3FC7B040;
+                    border-radius: 14px;
+                ">
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <div style="font-size: 42px; margin-bottom: 8px;">✅</div>
+                        <div style="font-size: 26px; font-weight: 700; color: #3FC7B0;">LEGITIMATE URL</div>
+                        <p style="margin: 8px 0 0 0; color: #A9B9C7; font-size: 14px;">
+                            ShieldNet's ML model classified this URL as legitimate.
+                        </p>
+                    </div>
+
+                    <!-- Checked URL -->
+                    <div style="margin-bottom: 22px;">
+                        <div style="font-size: 12px; color: #7E93A7; margin-bottom: 6px; font-weight: 600;">Checked URL</div>
+                        <div style="
+                            background: #101825;
+                            border: 1px solid #263444;
+                            border-radius: 9px;
+                            padding: 12px 16px;
+                            color: #E8EDF2;
+                            font-size: 14px;
+                            word-break: break-all;
+                        ">
+                            {{ url }}
+                        </div>
+                    </div>
+
+                    <!-- Legitimate Probability -->
+                    <div style="margin-bottom: 16px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;">
+                            <span style="color: #A9B9C7;">Legitimate Probability</span>
+                            <strong style="color: #3FC7B0;">{{ legitimate_probability }}%</strong>
+                        </div>
+                        <div style="height: 10px; background: #101825; border-radius: 20px; overflow: hidden;">
+                            <div style="height: 100%; width: {{ legitimate_probability }}%; background: #3FC7B0; border-radius: 20px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Phishing Probability -->
+                    <div style="margin-bottom: 22px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px;">
+                            <span style="color: #A9B9C7;">Phishing Probability</span>
+                            <strong style="color: #FF9DA0;">{{ phishing_probability }}%</strong>
+                        </div>
+                        <div style="height: 10px; background: #101825; border-radius: 20px; overflow: hidden;">
+                            <div style="height: 100%; width: {{ phishing_probability }}%; background: #E5484D; border-radius: 20px;"></div>
+                        </div>
+                    </div>
+
+                    <div style="
+                        padding: 14px 16px;
+                        background: #3FC7B018;
+                        border: 1px solid #3FC7B030;
+                        border-radius: 9px;
+                        color: #3FC7B0;
+                        font-size: 13px;
+                    ">
+                        <strong>Note:</strong>
+                        This result represents the ML model's classification and should not be treated as a guarantee that a website is completely safe.
+                    </div>
+                </div>
+                {% endif %}
+
+
+                <!-- How it works -->
+                <div style="
+                    margin-top: 24px;
+                    padding: 18px;
+                    background: #101825;
+                    border: 1px solid #263444;
+                    border-radius: 10px;
+                    font-size: 13px;
+                    color: #A9B9C7;
+                ">
+                    <strong style="color: #E8EDF2;">How ShieldNet works:</strong>
+                    <ul style="margin: 10px 0 0 0; padding-left: 18px;">
+                        <li style="margin-bottom: 4px;">The URL is converted into numerical security features.</li>
+                        <li style="margin-bottom: 4px;">A trained Random Forest machine learning model analyses those features.</li>
+                        <li>ShieldNet returns the model's phishing / legitimate classification.</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 24px; color: #7E93A7; font-size: 13px;">
+            ShieldNet © 2026 · AI-Powered Network Security Platform
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

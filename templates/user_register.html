@@ -1,0 +1,458 @@
+{% extends 'public page.html' %}
+{% block body %}
+
+<div style="
+    min-height: 85vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 15px;
+    box-sizing: border-box;
+    background-color: #0D1420;
+">
+
+    <div style="
+        width: 100%;
+        max-width: 620px;
+        background-color: #141E2B;
+        border: 1px solid #26344450;
+        border-radius: 16px;
+        padding: 36px 32px;
+        box-sizing: border-box;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+        font-family: 'Sora', system-ui, -apple-system, sans-serif;
+    ">
+
+        <!-- Header -->
+        <div style="text-align: center; margin-bottom: 26px;">
+            <div style="
+                width: 58px;
+                height: 58px;
+                margin: 0 auto 14px auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: #3FC7B01a;
+                border: 1px solid #3FC7B040;
+                border-radius: 50%;
+            ">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3FC7B0" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                </svg>
+            </div>
+
+            <h3 style="
+                font-weight: 700;
+                color: #E8EDF2;
+                margin: 0 0 6px 0;
+                font-size: 22px;
+                letter-spacing: -0.02em;
+            ">Create Account</h3>
+
+            <p style="
+                color: #7E93A7;
+                font-size: 13px;
+                margin: 0;
+                line-height: 1.5;
+            ">Join SHIELDNET and secure your network</p>
+        </div>
+
+
+        <!-- Django Messages -->
+        {% if messages %}
+            {% for message in messages %}
+                <div style="
+                    width: 100%;
+                    box-sizing: border-box;
+                    background-color: {% if 'success' in message.tags %}#3FC7B018{% else %}#E5484D18{% endif %};
+                    border: 1px solid {% if 'success' in message.tags %}#3FC7B040{% else %}#E5484D40{% endif %};
+                    color: {% if 'success' in message.tags %}#3FC7B0{% else %}#FF9DA0{% endif %};
+                    padding: 10px 14px;
+                    margin-bottom: 18px;
+                    border-radius: 8px;
+                    text-align: center;
+                    font-size: 13px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                ">
+                    {% if 'success' in message.tags %}
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#3FC7B0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                    {% else %}
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#FF9DA0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                            <line x1="12" y1="9" x2="12" y2="13"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    {% endif %}
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+
+        <!-- Registration Form -->
+        <form id="registerForm" action="/myapp/user_register/" method="POST" novalidate>
+            {% csrf_token %}
+
+            <!-- ========== ROW 1: Name + Email ========== -->
+            <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+
+                <!-- Full Name -->
+                <div style="flex: 1 1 260px; min-width: 240px;">
+                    <label for="name" style="display:block; font-size:13px; font-weight:600; color:#A9B9C7; margin-bottom:7px;">Full Name</label>
+                    <div style="display:flex; width:100%;">
+                        <div style="
+                            width:44px; min-width:44px; height:44px;
+                            display:flex; align-items:center; justify-content:center;
+                            background:#101825; border:1px solid #263444; border-right:none;
+                            border-radius:9px 0 0 9px; color:#7E93A7;
+                        ">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                        <input type="text" id="name" name="name" placeholder="Enter your full name"
+                            style="width:100%; height:44px; box-sizing:border-box; background:#101825; border:1px solid #263444; border-left:none; outline:none; color:#E8EDF2; font-size:14px; padding:0 14px; border-radius:0 9px 9px 0; transition:border-color 0.2s;">
+                    </div>
+                    <small id="nameError" style="display:none; color:#FF9DA0; font-size:12px; font-weight:500; margin-top:6px; align-items:center; gap:5px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF9DA0" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Please enter your full name
+                    </small>
+                </div>
+
+                <!-- Email -->
+                <div style="flex: 1 1 260px; min-width: 240px;">
+                    <label for="email" style="display:block; font-size:13px; font-weight:600; color:#A9B9C7; margin-bottom:7px;">Email (Gmail only)</label>
+                    <div style="display:flex; width:100%;">
+                        <div style="
+                            width:44px; min-width:44px; height:44px;
+                            display:flex; align-items:center; justify-content:center;
+                            background:#101825; border:1px solid #263444; border-right:none;
+                            border-radius:9px 0 0 9px; color:#7E93A7;
+                        ">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                        </div>
+                        <input type="email" id="email" name="email" placeholder="example@gmail.com"
+                            style="width:100%; height:44px; box-sizing:border-box; background:#101825; border:1px solid #263444; border-left:none; outline:none; color:#E8EDF2; font-size:14px; padding:0 14px; border-radius:0 9px 9px 0; transition:border-color 0.2s;">
+                    </div>
+                    <small id="emailError" style="display:none; color:#FF9DA0; font-size:12px; font-weight:500; margin-top:6px; align-items:center; gap:5px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF9DA0" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Email must be a valid Gmail address (@gmail.com)
+                    </small>
+                </div>
+            </div>
+
+
+            <!-- ========== ROW 2: Phone + Address ========== -->
+            <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px;">
+
+                <!-- Phone -->
+                <div style="flex: 1 1 260px; min-width: 240px;">
+                    <label for="phone" style="display:block; font-size:13px; font-weight:600; color:#A9B9C7; margin-bottom:7px;">Phone Number</label>
+                    <div style="display:flex; width:100%;">
+                        <div style="
+                            width:44px; min-width:44px; height:44px;
+                            display:flex; align-items:center; justify-content:center;
+                            background:#101825; border:1px solid #263444; border-right:none;
+                            border-radius:9px 0 0 9px; color:#7E93A7;
+                        ">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                            </svg>
+                        </div>
+                        <input type="tel" id="phone" name="phone" placeholder="6XXXXXXXXX" maxlength="10"
+                            style="width:100%; height:44px; box-sizing:border-box; background:#101825; border:1px solid #263444; border-left:none; outline:none; color:#E8EDF2; font-size:14px; padding:0 14px; border-radius:0 9px 9px 0; transition:border-color 0.2s;">
+                    </div>
+                    <small id="phoneError" style="display:none; color:#FF9DA0; font-size:12px; font-weight:500; margin-top:6px; align-items:center; gap:5px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF9DA0" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Phone must start with 6-9 and be exactly 10 digits
+                    </small>
+                </div>
+
+                <!-- Address -->
+                <div style="flex: 1 1 260px; min-width: 240px;">
+                    <label for="Adress" style="display:block; font-size:13px; font-weight:600; color:#A9B9C7; margin-bottom:7px;">Address</label>
+                    <div style="display:flex; width:100%;">
+                        <div style="
+                            width:44px; min-width:44px; height:44px;
+                            display:flex; align-items:center; justify-content:center;
+                            background:#101825; border:1px solid #263444; border-right:none;
+                            border-radius:9px 0 0 9px; color:#7E93A7;
+                        ">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                                <circle cx="12" cy="10" r="3"/>
+                            </svg>
+                        </div>
+                        <input type="text" id="Adress" name="Adress" placeholder="Enter your address"
+                            style="width:100%; height:44px; box-sizing:border-box; background:#101825; border:1px solid #263444; border-left:none; outline:none; color:#E8EDF2; font-size:14px; padding:0 14px; border-radius:0 9px 9px 0; transition:border-color 0.2s;">
+                    </div>
+                    <small id="addressError" style="display:none; color:#FF9DA0; font-size:12px; font-weight:500; margin-top:6px; align-items:center; gap:5px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF9DA0" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Please enter your address
+                    </small>
+                </div>
+            </div>
+
+
+            <!-- ========== ROW 3: Username + Password ========== -->
+            <div style="display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+
+                <!-- Username -->
+                <div style="flex: 1 1 260px; min-width: 240px;">
+                    <label for="username" style="display:block; font-size:13px; font-weight:600; color:#A9B9C7; margin-bottom:7px;">Username</label>
+                    <div style="display:flex; width:100%;">
+                        <div style="
+                            width:44px; min-width:44px; height:44px;
+                            display:flex; align-items:center; justify-content:center;
+                            background:#101825; border:1px solid #263444; border-right:none;
+                            border-radius:9px 0 0 9px; color:#7E93A7;
+                        ">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                        <input type="text" id="username" name="username" placeholder="Choose a username"
+                            style="width:100%; height:44px; box-sizing:border-box; background:#101825; border:1px solid #263444; border-left:none; outline:none; color:#E8EDF2; font-size:14px; padding:0 14px; border-radius:0 9px 9px 0; transition:border-color 0.2s;">
+                    </div>
+                    <small id="usernameError" style="display:none; color:#FF9DA0; font-size:12px; font-weight:500; margin-top:6px; align-items:center; gap:5px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF9DA0" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Please choose a username
+                    </small>
+                </div>
+
+                <!-- Password -->
+                <div style="flex: 1 1 260px; min-width: 240px;">
+                    <label for="password" style="display:block; font-size:13px; font-weight:600; color:#A9B9C7; margin-bottom:7px;">Password</label>
+                    <div style="display:flex; width:100%;">
+                        <div style="
+                            width:44px; min-width:44px; height:44px;
+                            display:flex; align-items:center; justify-content:center;
+                            background:#101825; border:1px solid #263444; border-right:none;
+                            border-radius:9px 0 0 9px; color:#7E93A7;
+                        ">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                        </div>
+                        <input type="password" id="password" name="password" placeholder="Create a password"
+                            style="width:100%; height:44px; box-sizing:border-box; background:#101825; border:1px solid #263444; border-left:none; border-right:none; outline:none; color:#E8EDF2; font-size:14px; padding:0 14px; transition:border-color 0.2s;">
+
+                        <!-- Show / Hide -->
+                        <div id="togglePassword" style="
+                            width:44px; min-width:44px; height:44px;
+                            display:flex; align-items:center; justify-content:center;
+                            background:#101825; border:1px solid #263444; border-left:none;
+                            border-radius:0 9px 9px 0; color:#7E93A7; cursor:pointer; transition:color 0.2s;
+                        " onmouseover="this.style.color='#3FC7B0'" onmouseout="this.style.color='#7E93A7'">
+                            <svg id="eyeOpen" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                            </svg>
+                            <svg id="eyeClosed" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                <line x1="1" y1="1" x2="23" y2="23"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <small id="passwordError" style="display:none; color:#FF9DA0; font-size:12px; font-weight:500; margin-top:6px; align-items:center; gap:5px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#FF9DA0" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        Please create a password
+                    </small>
+                </div>
+            </div>
+
+
+            <!-- Submit Button -->
+            <button type="submit" id="registerButton" style="
+                width:100%; height:46px;
+                display:flex; align-items:center; justify-content:center; gap:8px;
+                background:#3FC7B0; border:none; color:#06231D;
+                font-size:15px; font-weight:600; border-radius:9px;
+                cursor:pointer; transition:background-color 0.2s ease, transform 0.15s ease;
+            " onmouseover="this.style.backgroundColor='#35B09B'; this.style.transform='translateY(-1px)'"
+               onmouseout="this.style.backgroundColor='#3FC7B0'; this.style.transform='translateY(0)'">
+                <span>Create Account</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                    <circle cx="8.5" cy="7" r="4"/>
+                    <line x1="20" y1="8" x2="20" y2="14"/>
+                    <line x1="23" y1="11" x2="17" y2="11"/>
+                </svg>
+            </button>
+        </form>
+
+
+        <!-- Login link -->
+        <div style="
+            text-align:center; margin-top:24px; padding-top:18px;
+            border-top:1px solid #26344450;
+        ">
+            <p style="margin:0; font-size:13px; color:#7E93A7;">
+                Already have an account?
+                <a href="/myapp/login_page/#a   " style="
+                    color:#3FC7B0; text-decoration:none; font-weight:600; margin-left:4px;
+                    transition:opacity 0.2s;
+                " onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                    Sign In
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const form = document.getElementById('registerForm');
+    const nameInput = document.getElementById('name');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone');
+    const addressInput = document.getElementById('Adress');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+
+    const nameError = document.getElementById('nameError');
+    const emailError = document.getElementById('emailError');
+    const phoneError = document.getElementById('phoneError');
+    const addressError = document.getElementById('addressError');
+    const usernameError = document.getElementById('usernameError');
+    const passwordError = document.getElementById('passwordError');
+
+    const togglePassword = document.getElementById('togglePassword');
+    const eyeOpen = document.getElementById('eyeOpen');
+    const eyeClosed = document.getElementById('eyeClosed');
+
+    // Password visibility toggle
+    togglePassword.addEventListener('click', function () {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        eyeOpen.style.display = isPassword ? 'none' : 'block';
+        eyeClosed.style.display = isPassword ? 'block' : 'none';
+    });
+
+    // Helper to set error border
+    function setError(input, errorEl, message) {
+        errorEl.style.display = 'flex';
+        if (message) errorEl.lastChild.textContent = message;
+        input.style.borderColor = '#E5484D';
+        if (input.previousElementSibling) {
+            input.previousElementSibling.style.borderColor = '#E5484D';
+        }
+        if (input.nextElementSibling && input.nextElementSibling.id === 'togglePassword') {
+            input.nextElementSibling.style.borderColor = '#E5484D';
+        }
+    }
+
+    function clearError(input, errorEl) {
+        errorEl.style.display = 'none';
+        input.style.borderColor = '#263444';
+        if (input.previousElementSibling) {
+            input.previousElementSibling.style.borderColor = '#263444';
+        }
+        if (input.nextElementSibling && input.nextElementSibling.id === 'togglePassword') {
+            input.nextElementSibling.style.borderColor = '#263444';
+        }
+    }
+
+    // Live validation clearing
+    nameInput.addEventListener('input', () => {
+        if (nameInput.value.trim()) clearError(nameInput, nameError);
+    });
+    emailInput.addEventListener('input', () => {
+        if (emailInput.value.trim()) clearError(emailInput, emailError);
+    });
+    phoneInput.addEventListener('input', () => {
+        phoneInput.value = phoneInput.value.replace(/\D/g, '');
+        if (phoneInput.value.trim()) clearError(phoneInput, phoneError);
+    });
+    addressInput.addEventListener('input', () => {
+        if (addressInput.value.trim()) clearError(addressInput, addressError);
+    });
+    usernameInput.addEventListener('input', () => {
+        if (usernameInput.value.trim()) clearError(usernameInput, usernameError);
+    });
+    passwordInput.addEventListener('input', () => {
+        if (passwordInput.value.trim()) clearError(passwordInput, passwordError);
+    });
+
+    // Form submit validation
+    form.addEventListener('submit', function (e) {
+        let isValid = true;
+
+        // Name
+        if (!nameInput.value.trim()) {
+            setError(nameInput, nameError);
+            isValid = false;
+        } else {
+            clearError(nameInput, nameError);
+        }
+
+        // Email - must be @gmail.com
+        const emailVal = emailInput.value.trim().toLowerCase();
+        const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!emailVal) {
+            setError(emailInput, emailError, 'Please enter your email');
+            isValid = false;
+        } else if (!gmailRegex.test(emailVal)) {
+            setError(emailInput, emailError, 'Email must be a valid Gmail address (@gmail.com)');
+            isValid = false;
+        } else {
+            clearError(emailInput, emailError);
+        }
+
+        // Phone - starts with 6-9 and exactly 10 digits
+        const phoneVal = phoneInput.value.trim();
+        const phoneRegex = /^[6-9]\d{9}$/;
+        if (!phoneVal) {
+            setError(phoneInput, phoneError, 'Please enter your phone number');
+            isValid = false;
+        } else if (!phoneRegex.test(phoneVal)) {
+            setError(phoneInput, phoneError, 'Phone must start with 6-9 and be exactly 10 digits');
+            isValid = false;
+        } else {
+            clearError(phoneInput, phoneError);
+        }
+
+        // Address
+        if (!addressInput.value.trim()) {
+            setError(addressInput, addressError);
+            isValid = false;
+        } else {
+            clearError(addressInput, addressError);
+        }
+
+        // Username
+        if (!usernameInput.value.trim()) {
+            setError(usernameInput, usernameError);
+            isValid = false;
+        } else {
+            clearError(usernameInput, usernameError);
+        }
+
+        // Password
+        if (!passwordInput.value.trim()) {
+            setError(passwordInput, passwordError);
+            isValid = false;
+        } else {
+            clearError(passwordInput, passwordError);
+        }
+
+        if (!isValid) {
+            e.preventDefault();
+        }
+    });
+</script>
+
+{% endblock %}
