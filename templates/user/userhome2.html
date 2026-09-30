@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShieldNet | My Dashboard</title>
+  <meta name="description" content="ShieldNet provides Nmap-based network monitoring, DoS detection, phishing URL analysis, and sandboxed APK malware detection in one secure platform." />
+
+  <style>
+    :root {
+      --bg: #070b14;
+      --bg-soft: #0c1322;
+      --card: #101a2c;
+      --border: rgba(94, 234, 212, 0.18);
+      --text: #e8f0fb;
+      --muted: #9fb0c7;
+      --accent: #22d3ee;
+      --accent-2: #34d399;
+      --danger: #f87171;
+      --radius: 18px;
+      --shadow: 0 18px 50px rgba(0, 0, 0, 0.38);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(circle at 85% 15%, rgba(34, 211, 238, 0.14), transparent 32%),
+        radial-gradient(circle at 10% 75%, rgba(52, 211, 153, 0.10), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      width: min(1180px, 92%);
+      margin: auto;
+    }
+
+    /* Navbar */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(7, 11, 20, 0.78);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 0;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.35rem;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+    }
+
+    .logo-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #04121a;
+      font-weight: 900;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      flex-wrap: wrap;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.92rem;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: 1px solid transparent;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #04121a;
+      box-shadow: 0 12px 30px rgba(34, 211, 238, 0.24);
+    }
+
+    .btn-outline {
+      border-color: var(--border);
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .btn-light {
+      background: #fff;
+      color: #071018;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 95px 0 75px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 55px;
+      align-items: center;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(34, 211, 238, 0.07);
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 24px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      box-shadow: 0 0 12px var(--accent-2);
+    }
+
+    h1 {
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+      line-height: 1.08;
+      letter-spacing: -1.2px;
+      margin-bottom: 22px;
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero p {
+      color: var(--muted);
+      font-size: 1.08rem;
+      max-width: 580px;
+      margin-bottom: 32px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 34px;
+    }
+
+    .hero-stats {
+      display: flex;
+      gap: 34px;
+      flex-wrap: wrap;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 1.55rem;
+      color: var(--accent);
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    /* Dashboard */
+    .dashboard {
+      background: linear-gradient(160deg, rgba(16, 26, 44, 0.95), rgba(7, 11, 20, 0.95));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .dashboard-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-top h3 {
+      font-size: 1rem;
+    }
+
+    .status {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--accent-2);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      background: rgba(52, 211, 153, 0.10);
+      padding: 5px 12px;
+      border-radius: 999px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    .mini-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .mini-card span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      margin-bottom: 8px;
+    }
+
+    .mini-card strong {
+      font-size: 1.25rem;
+    }
+
+    .safe { color: var(--accent-2); }
+    .warn { color: #fbbf24; }
+    .bad { color: var(--danger); }
+
+    .summary-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .summary-row strong { color: var(--accent); }
+
+    /* Sections */
+    section {
+      padding: 85px 0;
+    }
+
+    .section-head {
+      text-align: center;
+      max-width: 730px;
+      margin: 0 auto 50px;
+    }
+
+    .section-head h2 {
+      font-size: clamp(1.9rem, 3.4vw, 2.7rem);
+      margin-bottom: 14px;
+      letter-spacing: -0.7px;
+    }
+
+    .section-head p {
+      color: var(--muted);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .feature {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: transform 0.25s ease, border-color 0.25s ease;
+    }
+
+    .feature:hover {
+      transform: translateY(-6px);
+      border-color: rgba(34, 211, 238, 0.45);
+    }
+
+    .icon {
+      width: 50px;
+      height: 50px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      font-size: 1.35rem;
+      background: rgba(34, 211, 238, 0.10);
+      border: 1px solid var(--border);
+      margin-bottom: 18px;
+    }
+
+    .feature h3 {
+      font-size: 1.12rem;
+      margin-bottom: 10px;
+    }
+
+    .feature p {
+      color: var(--muted);
+      font-size: 0.94rem;
+    }
+
+    /* Workflow */
+    .workflow {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .step {
+      position: relative;
+      background: var(--bg-soft);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 30px 24px;
+    }
+
+    .step-number {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+
+    .step h3 {
+      margin-bottom: 10px;
+      font-size: 1.08rem;
+    }
+
+    .step p {
+      color: var(--muted);
+      font-size: 0.93rem;
+    }
+
+    /* CTA */
+    .cta {
+      background:
+        radial-gradient(circle at 20% 20%, rgba(34, 211, 238, 0.16), transparent 35%),
+        linear-gradient(135deg, #0d1626, #091120);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 65px 45px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .cta h2 {
+      font-size: clamp(1.9rem, 4vw, 2.7rem);
+      margin-bottom: 16px;
+    }
+
+    .cta p {
+      color: var(--muted);
+      max-width: 620px;
+      margin: 0 auto 30px;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+      background: #050810;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      gap: 35px;
+    }
+
+    footer p,
+    footer a {
+      color: var(--muted);
+      font-size: 0.92rem;
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      color: var(--accent);
+    }
+
+    .footer-links {
+      display: grid;
+      gap: 10px;
+    }
+
+    .copyright {
+      margin-top: 38px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .features,
+      .workflow {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .nav-links {
+        display: none;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .features,
+      .workflow,
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+      .hero {
+        padding: 65px 0 55px;
+      }
+      .cta {
+        padding: 45px 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container nav">
+      <div class="logo">
+        <div class="logo-mark">S</div>
+        ShieldNet
+      </div>
+
+      <nav class="nav-links">
+        <a href="/myapp/userhome/">Home</a>
+        <a href="/myapp/user_view_profile/#a">Profile</a>
+        <a href="/myapp/view_apk_reports/#a">APK Malware</a>
+        <a href="/myapp/phishing-check/#a">Phishing Scan</a>
+        <a href="/myapp/network_scan/#a">Network Scan</a>
+        <a href="/myapp/user_view_and_sent_complaints/#a">Complaints</a>
+        <a href="/myapp/user_view_and_send_feedback/#a">Feedback</a>
+      </nav>
+
+      <div style="display:flex; gap:10px;">
+        <a class="btn btn-primary" href="/myapp/logout_page/">Logout</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="pill">
+            <span class="dot"></span>
+            Welcome{% if user_profile %}, {{ user_profile.name }}{% endif %}
+          </div>
+
+          <h1>
+            Your security <span class="gradient-text">overview</span>
+          </h1>
+
+          <p>
+            Monitor your network scans, phishing checks, and APK analysis results
+            from one private dashboard. All data is visible only to you.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="/myapp/network_scan/#a">New Network Scan</a>
+            <a class="btn btn-outline" href="/myapp/phishing-check/#a">Check URL</a>
+          </div>
+
+          <div class="hero-stats">
+            <div class="stat">
+              <strong>{{ total_scans }}</strong>
+              <span>Network scans</span>
+            </div>
+            <div class="stat">
+              <strong>{{ total_phishing }}</strong>
+              <span>Phishing checks</span>
+            </div>
+            <div class="stat">
+              <strong>{{ total_apks }}</strong>
+              <span>APK analyses</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- LIVE DASHBOARD (your data only) -->
+        <div class="dashboard">
+          <div class="dashboard-top">
+            <h3>My Security Dashboard</h3>
+            <span class="status">SYSTEM PROTECTED</span>
+          </div>
+
+          <div class="dashboard-grid">
+            <div class="mini-card">
+              <span>Network Scan</span>
+              <strong>{{ open_ports }} Open Ports</strong>
+            </div>
+
+            <div class="mini-card">
+              <span>Network Status</span>
+              <strong class="{% if network_status == 'Suspicious' %}warn{% else %}safe{% endif %}">
+                {{ network_status }}
+              </strong>
+            </div>
+
+            <div class="mini-card">
+              <span>Phishing URL Check</span>
+              <strong class="{% if phishing_status == 'PHISHING' %}bad{% else %}safe{% endif %}">
+                {{ phishing_status }}
+              </strong>
+            </div>
+
+            <div class="mini-card">
+              <span>APK Verdict</span>
+              <strong class="{% if apk_verdict == 'Critical Malware' %}bad{% elif apk_verdict == 'Suspicious' %}warn{% else %}safe{% endif %}">
+                {{ apk_verdict }}
+              </strong>
+            </div>
+
+            <div class="mini-card">
+              <span>Request Rate</span>
+              <strong class="{% if 'Attack' in request_rate_status %}bad{% elif 'Elevated' in request_rate_status %}warn{% else %}safe{% endif %}">
+                {{ request_rate_status }}
+              </strong>
+            </div>
+
+            <div class="mini-card">
+              <span>Sandbox Status</span>
+              <strong class="safe">{{ sandbox_status }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div id="a" class="container">
+      {% block body %}
+      {% endblock %}
+    </div>
+
+    <section id="features">
+      <div class="container">
+        <div class="section-head">
+          <h2>Your security tools</h2>
+          <p>
+            Run network scans, check suspicious URLs, and analyze APK files —
+            all results stay private to your account.
+          </p>
+        </div>
+
+        <div class="features">
+          <article class="feature">
+            <div class="icon">📡</div>
+            <h3>Nmap Network Monitoring</h3>
+            <p>
+              Scan authorized targets to identify live hosts, open ports, running services,
+              and potentially suspicious exposure.
+            </p>
+          </article>
+
+          <article class="feature">
+            <div class="icon">🛡️</div>
+            <h3>DoS Attack Detection</h3>
+            <p>
+              Your request patterns are monitored. Abnormal volume triggers
+              alerts and automatic protection.
+            </p>
+          </article>
+
+          <article class="feature">
+            <div class="icon">🔗</div>
+            <h3>Phishing URL Detection</h3>
+            <p>
+              Submit any URL for machine-learning classification as phishing or legitimate.
+            </p>
+          </article>
+
+          <article class="feature">
+            <div class="icon">📱</div>
+            <h3>APK Malware Analysis</h3>
+            <p>
+              Upload Android apps for static, sandbox, and ML analysis to receive a safe or harmful verdict.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="workflow" style="background: rgba(255,255,255,0.015);">
+      <div class="container">
+        <div class="section-head">
+          <h2>How it works for you</h2>
+          <p>
+            Every analysis keeps untrusted files and suspicious targets away from the production server.
+          </p>
+        </div>
+
+        <div class="workflow">
+          <article class="step">
+            <div class="step-number">STEP 01</div>
+            <h3>Login</h3>
+            <p>Access your private ShieldNet dashboard securely.</p>
+          </article>
+
+          <article class="step">
+            <div class="step-number">STEP 02</div>
+            <h3>Run Checks</h3>
+            <p>Perform Nmap scans, check URLs, or upload APK files.</p>
+          </article>
+
+          <article class="step">
+            <div class="step-number">STEP 03</div>
+            <h3>Analyze Safely</h3>
+            <p>Uploads are inspected inside a disposable sandbox.</p>
+          </article>
+
+          <article class="step">
+            <div class="step-number">STEP 04</div>
+            <h3>View Results</h3>
+            <p>See scan results, phishing verdicts, and malware status.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="cta">
+          <h2>Ready to run a new check?</h2>
+          <p>
+            Start a network scan, check a suspicious URL, or upload an APK for analysis.
+          </p>
+          <div class="hero-actions" style="justify-content:center;">
+            <a class="btn btn-light" href="/myapp/network_scan/#a">Network Scan</a>
+            <a class="btn btn-outline" href="/myapp/phishing-check/#a">Phishing Check</a>
+            <a class="btn btn-outline" href="/myapp/view_apk_reports/#a">APK Analysis</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="logo" style="margin-bottom:14px;">
+            <div class="logo-mark">S</div>
+            ShieldNet
+          </div>
+          <p>
+            Your private AI-powered network security dashboard for monitoring,
+            threat detection, phishing analysis, and sandboxed APK scanning.
+          </p>
+        </div>
+
+        <div>
+          <h4>Tools</h4>
+          <div class="footer-links" style="margin-top:12px;">
+            <a href="/myapp/network_scan/#a">Network Scan</a>
+            <a href="/myapp/phishing-check/#a">Phishing Check</a>
+            <a href="/myapp/view_apk_reports/#a">APK Analysis</a>
+          </div>
+        </div>
+
+        <div>
+          <h4>Account</h4>
+          <div class="footer-links" style="margin-top:12px;">
+            <a href="/myapp/user_view_profile/#a">Profile</a>
+            <a href="/myapp/user_view_and_sent_complaints/#a">Complaints</a>
+            <a href="/myapp/user_view_and_send_feedback/#a">Feedback</a>
+            <a href="/myapp/logout_page/">Logout</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="copyright">
+        © 2026 ShieldNet. All rights reserved. | AI-Powered Network Security Platform
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
