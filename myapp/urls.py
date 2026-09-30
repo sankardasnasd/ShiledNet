@@ -38,4 +38,15 @@ urlpatterns = [
     path('view_apk_reports/', views.view_apk_reports, name='view_apk_reports'),
     path('network_scan/', views.network_scan, name='network_scan'),
 
+
+
+    path( 'all-users/',views.all_users,name='all_users'),
+
+    path( 'chat_view/',views.chat_view,name='chat_view'),
+    path( 'user_chat_to_user/<id>/',views.user_chat_to_user,name='user_chat_to_user'),
+    path( 'chat_send/<msg>',views.chat_send,name='chat_send'),
+
+
+
+
 ]

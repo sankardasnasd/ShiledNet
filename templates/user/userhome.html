@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ShieldNet | AI-Powered Network Security Platform</title>
+  <title>ShieldNet | My Dashboard</title>
   <meta name="description" content="ShieldNet provides Nmap-based network monitoring, DoS detection, phishing URL analysis, and sandboxed APK malware detection in one secure platform." />
 
   <style>
@@ -82,13 +82,14 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 28px;
+      gap: 22px;
+      flex-wrap: wrap;
     }
 
     .nav-links a {
       color: var(--muted);
       text-decoration: none;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       transition: color 0.2s ease;
     }
 
@@ -166,7 +167,7 @@
     }
 
     h1 {
-      font-size: clamp(2.4rem, 5vw, 4rem);
+      font-size: clamp(2.2rem, 4.5vw, 3.4rem);
       line-height: 1.08;
       letter-spacing: -1.2px;
       margin-bottom: 22px;
@@ -210,7 +211,7 @@
       font-size: 0.88rem;
     }
 
-    /* Dashboard preview */
+    /* Dashboard */
     .dashboard {
       background: linear-gradient(160deg, rgba(16, 26, 44, 0.95), rgba(7, 11, 20, 0.95));
       border: 1px solid var(--border);
@@ -261,12 +262,22 @@
     }
 
     .mini-card strong {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
     }
 
     .safe { color: var(--accent-2); }
     .warn { color: #fbbf24; }
     .bad { color: var(--danger); }
+
+    .summary-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .summary-row strong { color: var(--accent); }
 
     /* Sections */
     section {
@@ -362,45 +373,6 @@
       font-size: 0.93rem;
     }
 
-    /* Roles */
-    .roles {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 22px;
-    }
-
-    .role {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 34px;
-    }
-
-    .role h3 {
-      font-size: 1.35rem;
-      margin-bottom: 16px;
-    }
-
-    .role ul {
-      list-style: none;
-    }
-
-    .role li {
-      color: var(--muted);
-      padding-left: 26px;
-      position: relative;
-      margin-bottom: 10px;
-      font-size: 0.96rem;
-    }
-
-    .role li::before {
-      content: "✓";
-      position: absolute;
-      left: 0;
-      color: var(--accent-2);
-      font-weight: 800;
-    }
-
     /* CTA */
     .cta {
       background:
@@ -463,16 +435,13 @@
 
     @media (max-width: 980px) {
       .hero-grid,
-      .roles,
       .footer-grid {
         grid-template-columns: 1fr;
       }
-
       .features,
       .workflow {
         grid-template-columns: repeat(2, 1fr);
       }
-
       .nav-links {
         display: none;
       }
@@ -484,11 +453,9 @@
       .dashboard-grid {
         grid-template-columns: 1fr;
       }
-
       .hero {
         padding: 65px 0 55px;
       }
-
       .cta {
         padding: 45px 25px;
       }
@@ -507,9 +474,10 @@
       <nav class="nav-links">
         <a href="/myapp/userhome/">Home</a>
         <a href="/myapp/user_view_profile/#a">Profile</a>
-        <a href="/myapp/view_apk_reports/#a">Apk Malware</a>
+        <a href="/myapp/view_apk_reports/#a">APK Malware</a>
         <a href="/myapp/phishing-check/#a">Phishing Scan</a>
         <a href="/myapp/network_scan/#a">Network Scan</a>
+        <a href="/myapp/all-users/#a">All Users</a>
         <a href="/myapp/user_view_and_sent_complaints/#a">Complaints</a>
         <a href="/myapp/user_view_and_send_feedback/#a">Feedback</a>
       </nav>
@@ -526,93 +494,101 @@
         <div>
           <div class="pill">
             <span class="dot"></span>
-            AI-Powered Network Security Platform
+            Welcome{% if user_profile %}, {{ user_profile.name }}{% endif %}
           </div>
 
           <h1>
-            Detect threats before they <span class="gradient-text">become breaches</span>
+            Your security <span class="gradient-text">overview</span>
           </h1>
 
           <p>
-            ShieldNet combines Nmap-based network monitoring, real-time DoS attack detection,
-            machine-learning phishing URL analysis, and sandboxed Android APK malware scanning
-            in one unified Django-powered security dashboard.
+            Monitor your network scans, phishing checks, and APK analysis results
+            from one private dashboard. All data is visible only to you.
           </p>
 
           <div class="hero-actions">
-            <a class="btn btn-primary" href="">Create Free Account</a>
-            <a class="btn btn-outline" href="#features">Explore Features</a>
+            <a class="btn btn-primary" href="/myapp/network_scan/#a">New Network Scan</a>
+            <a class="btn btn-outline" href="/myapp/phishing-check/#a">Check URL</a>
           </div>
 
           <div class="hero-stats">
             <div class="stat">
-              <strong>4-in-1</strong>
-              <span>Security modules</span>
+              <strong>{{ total_scans }}</strong>
+              <span>Network scans</span>
             </div>
             <div class="stat">
-              <strong>Real-time</strong>
-              <span>DoS monitoring</span>
+              <strong>{{ total_phishing }}</strong>
+              <span>Phishing checks</span>
             </div>
             <div class="stat">
-              <strong>Isolated</strong>
-              <span>APK sandbox analysis</span>
+              <strong>{{ total_apks }}</strong>
+              <span>APK analyses</span>
             </div>
           </div>
         </div>
 
+        <!-- LIVE DASHBOARD (your data only) -->
         <div class="dashboard">
           <div class="dashboard-top">
-            <h3>ShieldNet Security Dashboard</h3>
+            <h3>My Security Dashboard</h3>
             <span class="status">SYSTEM PROTECTED</span>
           </div>
 
           <div class="dashboard-grid">
             <div class="mini-card">
               <span>Network Scan</span>
-              <strong>18 Open Ports</strong>
+              <strong>{{ open_ports }} Open Ports</strong>
             </div>
 
             <div class="mini-card">
-              <span>Active Services</span>
-              <strong>7 Detected</strong>
+              <span>Network Status</span>
+              <strong class="{% if network_status == 'Suspicious' %}warn{% else %}safe{% endif %}">
+                {{ network_status }}
+              </strong>
             </div>
 
             <div class="mini-card">
               <span>Phishing URL Check</span>
-              <strong class="bad">High Risk</strong>
+              <strong class="{% if phishing_status == 'PHISHING' %}bad{% else %}safe{% endif %}">
+                {{ phishing_status }}
+              </strong>
             </div>
 
             <div class="mini-card">
               <span>APK Verdict</span>
-              <strong class="safe">Safe</strong>
+              <strong class="{% if apk_verdict == 'Critical Malware' %}bad{% elif apk_verdict == 'Suspicious' %}warn{% else %}safe{% endif %}">
+                {{ apk_verdict }}
+              </strong>
             </div>
 
             <div class="mini-card">
               <span>Request Rate</span>
-              <strong class="warn">Monitoring</strong>
+              <strong class="{% if 'Attack' in request_rate_status %}bad{% elif 'Elevated' in request_rate_status %}warn{% else %}safe{% endif %}">
+                {{ request_rate_status }}
+              </strong>
             </div>
 
             <div class="mini-card">
               <span>Sandbox Status</span>
-              <strong class="safe">Isolated</strong>
+              <strong class="safe">{{ sandbox_status }}</strong>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-      <div id="a" class="container">
-          {% block body %}
-          {% endblock %}
-      </div>
+    <div id="a" class="container">
+      {% block body %}
+      {% endblock %}
+    </div>
 
     <section id="features">
       <div class="container">
         <div class="section-head">
-          <h2>Complete threat visibility in one platform</h2>
+          <h2>Your security tools</h2>
           <p>
-            ShieldNet brings network reconnaissance, abuse prevention, phishing intelligence,
-            and mobile malware analysis together in a single responsive web application.
+            Run network scans, check suspicious URLs, and analyze APK files —
+            all results stay private to your account.
           </p>
         </div>
 
@@ -622,7 +598,7 @@
             <h3>Nmap Network Monitoring</h3>
             <p>
               Scan authorized targets to identify live hosts, open ports, running services,
-              service versions, and potentially suspicious exposure.
+              and potentially suspicious exposure.
             </p>
           </article>
 
@@ -630,8 +606,8 @@
             <div class="icon">🛡️</div>
             <h3>DoS Attack Detection</h3>
             <p>
-              Continuously monitors user request patterns. Abnormal request volume triggers
-              alerts and automatic blocking to prevent platform abuse.
+              Your request patterns are monitored. Abnormal volume triggers
+              alerts and automatic protection.
             </p>
           </article>
 
@@ -639,8 +615,7 @@
             <div class="icon">🔗</div>
             <h3>Phishing URL Detection</h3>
             <p>
-              Submit any URL for machine-learning-based classification as phishing or legitimate,
-              supported by extracted URL and content features.
+              Submit any URL for machine-learning classification as phishing or legitimate.
             </p>
           </article>
 
@@ -648,8 +623,7 @@
             <div class="icon">📱</div>
             <h3>APK Malware Analysis</h3>
             <p>
-              Upload Android applications for static, sandbox, and machine-learning analysis
-              to receive a safe or harmful verdict.
+              Upload Android apps for static, sandbox, and ML analysis to receive a safe or harmful verdict.
             </p>
           </article>
         </div>
@@ -659,112 +633,35 @@
     <section id="workflow" style="background: rgba(255,255,255,0.015);">
       <div class="container">
         <div class="section-head">
-          <h2>How ShieldNet protects your environment</h2>
+          <h2>How it works for you</h2>
           <p>
-            Every analysis is designed to keep untrusted files and suspicious targets away
-            from the production server.
+            Every analysis keeps untrusted files and suspicious targets away from the production server.
           </p>
         </div>
 
         <div class="workflow">
           <article class="step">
             <div class="step-number">STEP 01</div>
-            <h3>Register & Login</h3>
-            <p>Users create an account and access the secure, role-based ShieldNet dashboard.</p>
+            <h3>Login</h3>
+            <p>Access your private ShieldNet dashboard securely.</p>
           </article>
 
           <article class="step">
             <div class="step-number">STEP 02</div>
-            <h3>Run Security Checks</h3>
-            <p>Perform Nmap scans, check suspicious URLs, or upload APK files for analysis.</p>
+            <h3>Run Checks</h3>
+            <p>Perform Nmap scans, check URLs, or upload APK files.</p>
           </article>
 
           <article class="step">
             <div class="step-number">STEP 03</div>
             <h3>Analyze Safely</h3>
-            <p>Uploads are inspected inside a disposable sandbox isolated from the live server.</p>
+            <p>Uploads are inspected inside a disposable sandbox.</p>
           </article>
 
           <article class="step">
             <div class="step-number">STEP 04</div>
-            <h3>Receive Verdict</h3>
-            <p>View scan results, phishing classification, malware status, and security insights.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="roles">
-      <div class="container">
-        <div class="section-head">
-          <h2>Role-based access for every user</h2>
-          <p>
-            ShieldNet separates administrative control from normal security-analysis access,
-            ensuring safer platform management.
-          </p>
-        </div>
-
-        <div class="roles">
-          <article class="role">
-            <h3>For Users</h3>
-            <ul>
-              <li>Register and securely log in to the dashboard</li>
-              <li>Run authorized Nmap-based network scans</li>
-              <li>Check URLs for phishing indicators</li>
-              <li>Upload APK files for malware analysis</li>
-              <li>View scan history and analysis reports</li>
-              <li>Communicate through the in-platform chat feature</li>
-            </ul>
-          </article>
-
-          <article class="role">
-            <h3>For Administrators</h3>
-            <ul>
-              <li>Manage registered user accounts</li>
-              <li>Monitor and review blocked users</li>
-              <li>Handle complaints and feedback</li>
-              <li>Track scanning and analysis activity</li>
-              <li>Maintain platform security policies</li>
-              <li>Respond to user support requests</li>
-            </ul>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="security">
-      <div class="container">
-        <div class="section-head">
-          <h2>Security-first by design</h2>
-          <p>
-            ShieldNet uses isolation, access control, and automated monitoring to reduce
-            the risk of malicious uploads and service abuse.
-          </p>
-        </div>
-
-        <div class="features">
-          <article class="feature">
-            <div class="icon">🧪</div>
-            <h3>Disposable Sandbox</h3>
-            <p>Uploaded APK files are executed and inspected in an isolated, temporary environment.</p>
-          </article>
-
-          <article class="feature">
-            <div class="icon">🚫</div>
-            <h3>Automatic Blocking</h3>
-            <p>Request flooding is detected and offending accounts can be blocked automatically.</p>
-          </article>
-
-          <article class="feature">
-            <div class="icon">🔐</div>
-            <h3>Role-Based Access</h3>
-            <p>Admin and user permissions are separated to protect sensitive platform operations.</p>
-          </article>
-
-          <article class="feature">
-            <div class="icon">📊</div>
-            <h3>Audit Trails</h3>
-            <p>Scans, URL checks, APK verdicts, and administrative actions are recorded for review.</p>
+            <h3>View Results</h3>
+            <p>See scan results, phishing verdicts, and malware status.</p>
           </article>
         </div>
       </div>
@@ -773,14 +670,14 @@
     <section>
       <div class="container">
         <div class="cta">
-          <h2>Start securing your network with ShieldNet</h2>
+          <h2>Ready to run a new check?</h2>
           <p>
-            Create an account to access Nmap monitoring, phishing detection, APK malware analysis,
-            and real-time DoS protection from one unified dashboard.
+            Start a network scan, check a suspicious URL, or upload an APK for analysis.
           </p>
           <div class="hero-actions" style="justify-content:center;">
-            <a class="btn btn-light" href="/myapp/user_register/#a">Register Now</a>
-            <a class="btn btn-outline" href="/myapp/login_page/#a">Login to Dashboard</a>
+            <a class="btn btn-light" href="/myapp/network_scan/#a">Network Scan</a>
+            <a class="btn btn-outline" href="/myapp/phishing-check/#a">Phishing Check</a>
+            <a class="btn btn-outline" href="/myapp/view_apk_reports/#a">APK Analysis</a>
           </div>
         </div>
       </div>
@@ -796,28 +693,27 @@
             ShieldNet
           </div>
           <p>
-            An integrated AI-powered network security platform for monitoring, threat detection,
-            phishing analysis, and sandboxed APK malware scanning.
+            Your private AI-powered network security dashboard for monitoring,
+            threat detection, phishing analysis, and sandboxed APK scanning.
           </p>
         </div>
 
         <div>
-          <h4>Platform</h4>
+          <h4>Tools</h4>
           <div class="footer-links" style="margin-top:12px;">
-            <a href="#features">Features</a>
-            <a href="#workflow">How It Works</a>
-            <a href="#roles">Access Roles</a>
-            <a href="#security">Security</a>
+            <a href="/myapp/network_scan/#a">Network Scan</a>
+            <a href="/myapp/phishing-check/#a">Phishing Check</a>
+            <a href="/myapp/view_apk_reports/#a">APK Analysis</a>
           </div>
         </div>
 
         <div>
           <h4>Account</h4>
           <div class="footer-links" style="margin-top:12px;">
-            <a href="/myapp/login_page/#a">Login</a>
-            <a href="/myapp/user_register/#a">Register</a>
-            <a href="#">Support</a>
-            <a href="#">Privacy Policy</a>
+            <a href="/myapp/user_view_profile/#a">Profile</a>
+            <a href="/myapp/user_view_and_sent_complaints/#a">Complaints</a>
+            <a href="/myapp/user_view_and_send_feedback/#a">Feedback</a>
+            <a href="/myapp/logout_page/">Logout</a>
           </div>
         </div>
       </div>

@@ -7,12 +7,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root{
     --bg:#0D1420; --panel:#141E2B; --panel-2:#101825; --border:#26344499; --border-soft:#26344450;
     --text:#E8EDF2; --muted:#7E93A7; --muted-2:#57687A; --teal:#3FC7B0; --teal-dim:#3FC7B01f;
     --red:#E5484D; --red-dim:#E5484D22; --amber:#E5A73F; --amber-dim:#E5A73F22;
-    box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -21,34 +22,34 @@
   a{color:inherit;text-decoration:none}
 
   .shell{display:grid;grid-template-columns:240px 1fr;height:100vh;height:100dvh;}
-
-  /* sidebar */
-  .sidebar{background:var(--panel-2);border-right:1px solid var(--border-soft);display:flex;flex-direction:column;padding:20px 14px;padding-top:calc(20px + env(safe-area-inset-top,0px));}
+  .sidebar{background:var(--panel-2);border-right:1px solid var(--border-soft);display:flex;flex-direction:column;padding:20px 14px;}
   .brand{display:flex;align-items:center;gap:9px;font-weight:700;padding:6px 8px 22px;font-size:1rem;}
   .brand-mark{width:24px;height:24px;border-radius:6px;background:linear-gradient(155deg,var(--teal),#1F8C7B);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono';font-size:11px;font-weight:600;color:#06231D;}
   .navsec{font-size:.68rem;letter-spacing:.04em;color:var(--muted-2);padding:14px 10px 6px;text-transform:uppercase;}
   .navlink{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:7px;font-size:.87rem;color:var(--muted);cursor:pointer;transition:.15s;}
   .navlink:hover{color:var(--text);background:var(--panel);}
   .navlink.active{color:var(--text);background:var(--teal-dim);border:1px solid #3FC7B040;}
-  .navlink .ico{width:16px;text-align:center;font-family:'JetBrains Mono';font-size:.78rem;color:inherit;opacity:.8;}
-  .navlink .count{margin-left:auto;font-family:'JetBrains Mono';font-size:.72rem;color:var(--muted-2);}
+  .navlink .ico{width:16px;text-align:center;font-family:'JetBrains Mono';font-size:.78rem;opacity:.8;}
   .sidebar-foot{margin-top:auto;border-top:1px solid var(--border-soft);padding-top:14px;display:flex;align-items:center;gap:9px;}
   .avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(155deg,#3FC7B0,#1F8C7B);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:600;color:#06231D;flex-shrink:0;}
   .sidebar-foot .who{font-size:.8rem;line-height:1.3;}
   .sidebar-foot .who .r{color:var(--muted-2);font-size:.72rem;}
 
-  /* main */
   .main{overflow-y:auto;}
-  .topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:16px 28px;padding-top:calc(16px + env(safe-area-inset-top,0px));background:rgba(13,20,32,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border-soft);}
-  .topbar h1{font-size:1.15rem;margin:0;letter-spacing:-0.01em;}
+  .topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:16px 28px;background:rgba(13,20,32,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border-soft);}
+  .topbar h1{font-size:1.15rem;margin:0;}
   .topbar .sub{color:var(--muted-2);font-size:.8rem;margin-top:2px;}
-  .search{background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:.83rem;color:var(--muted);width:220px;}
-  .search:focus{outline:none;border-color:var(--teal);}
   .content{padding:26px 28px 60px;}
-  .section{display:none;}
-  .section.active{display:block;}
 
-  /* stat cards */
+  .search-box{
+    background:var(--panel);border:1px solid var(--border);border-radius:8px;
+    padding:9px 14px 9px 38px;font-size:.85rem;color:var(--text);width:260px;outline:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%237E93A7' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:12px center;
+  }
+  .search-box:focus{border-color:var(--teal);}
+  .search-box::placeholder{color:var(--muted-2);}
+
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
   .stat{background:var(--panel);border:1px solid var(--border-soft);border-radius:11px;padding:18px 20px;}
   .stat .label{font-size:.78rem;color:var(--muted-2);margin-bottom:8px;}
@@ -56,6 +57,12 @@
   .stat .delta{font-size:.75rem;margin-top:6px;color:var(--muted);}
   .stat .delta.up{color:var(--teal);}
   .stat .delta.warn{color:var(--red);}
+
+  /* Charts grid */
+  .charts{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:24px;}
+  .chart-card{background:var(--panel);border:1px solid var(--border-soft);border-radius:11px;padding:18px 20px;}
+  .chart-card h3{font-size:.9rem;margin:0 0 14px;font-weight:600;color:var(--muted);}
+  .chart-wrap{position:relative;height:220px;}
 
   .panel{background:var(--panel);border:1px solid var(--border-soft);border-radius:11px;overflow:hidden;margin-bottom:22px;}
   .panel-head{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border-soft);}
@@ -76,17 +83,15 @@
   .badge.warn{background:var(--amber-dim);color:var(--amber);border:1px solid #E5A73F40;}
   .badge.neu{background:#26344440;color:var(--muted);border:1px solid var(--border);}
 
-  .rowbtn{font-family:'Sora';font-size:.76rem;font-weight:600;padding:5px 11px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text);cursor:pointer;}
-  .rowbtn:hover{border-color:var(--teal);}
-  .rowbtn.danger:hover{border-color:var(--red);color:#FF9DA0;}
-
   .empty{padding:34px 20px;text-align:center;color:var(--muted-2);font-size:.85rem;}
+  .no-results{display:none;padding:20px;text-align:center;color:var(--muted-2);font-size:.85rem;}
 
   @media (max-width:980px){
     .shell{grid-template-columns:1fr;}
     .sidebar{display:none;}
-    .stats{grid-template-columns:repeat(2,1fr);}
+    .stats,.charts{grid-template-columns:1fr;}
     table{display:block;overflow-x:auto;}
+    .search-box{width:180px;}
   }
 </style>
 </head>
@@ -97,253 +102,418 @@
     <div class="brand"><span class="brand-mark">SN</span>ShieldNet Admin</div>
 
     <div class="navsec">Overview</div>
-    <div class="navlink active" data-target="overview"><span class="ico">◆</span> Dashboard</div>
+    <div class="navlink active"><span class="ico">◆</span> Dashboard</div>
 
     <div class="navsec">Users</div>
-    <div class="navlink" data-target="users"><span class="ico">◇</span><a href="/myapp/admin_view_users/#a">All Users</a> </div>
-    <div class="navlink" data-target="users"><span class="ico">⛔</span><a href="/myapp/admin_view_blocked_users/#a">Blocked users</a> <span class="count">1,284</span></div>
+    <a class="navlink" href="/myapp/admin_view_users/#a"><span class="ico">◇</span> All Users</a>
+    <a class="navlink" href="/myapp/admin_view_blocked_users/#a"><span class="ico">⛔</span> Blocked users</a>
 
     <div class="navsec">Logs</div>
-
-    <div class="navlink" data-target="users"><span class="ico">▤</span><a href="/myapp/admin_view_network_scan_logs/#a">Network scans</a> </div>
-    <div class="navlink" data-target="users"><span class="ico">▤</span><a href="/myapp/admin_view_phishing_logs/#a">Phishing checks</a> </div>
-    <div class="navlink" data-target="users"><span class="ico">▤</span><a href="/myapp/admin_view_apk_scan_logs/#a">APK scans</a> </div>
-
-
+    <a class="navlink" href="/myapp/admin_view_network_scan_logs/#a"><span class="ico">▤</span> Network scans</a>
+    <a class="navlink" href="/myapp/admin_view_phishing_logs/#a"><span class="ico">▤</span> Phishing checks</a>
+    <a class="navlink" href="/myapp/admin_view_apk_scan_logs/#a"><span class="ico">▤</span> APK scans</a>
 
     <div class="navsec">Support</div>
-
-      <div class="navlink" data-target="users"><span class="ico">✉</span><a href="/myapp/admin_view_complaint_and_reply/#a">Complaints</a> </div>
-      <div class="navlink" data-target="users"><span class="ico">★</span><a href="/myapp/admin_view_feedback/#a">Feedback</a> </div>
-
+    <a class="navlink" href="/myapp/admin_view_complaint_and_reply/#a"><span class="ico">✉</span> Complaints</a>
+    <a class="navlink" href="/myapp/admin_view_feedback/#a"><span class="ico">★</span> Feedback</a>
 
     <div class="sidebar-foot">
       <div class="avatar">AD</div>
       <div class="who">Admin<div class="r">Super admin</div></div>
-              <div class="navlink" data-target="users"><span class="ico">=></span><a href="/myapp/logout_page/#a" class="btn btn-danger">Logout</a> </div>
-
+      <a href="/myapp/logout_page/#a" style="margin-left:auto;font-size:.78rem;color:var(--muted);">Logout</a>
     </div>
   </aside>
 
   <div class="main">
     <div class="topbar">
-      <div><h1 id="pageTitle">Dashboard</h1><div class="sub" id="pageSub">Platform overview</div></div>
-      <input class="search" placeholder="Search…">
+      <div>
+        <h1>Dashboard</h1>
+        <div class="sub">Platform overview & analytics</div>
+      </div>
+      <input type="text" id="globalSearch" class="search-box" placeholder="Search users, scans, URLs…">
     </div>
 
     <div class="content">
 
-      <!-- OVERVIEW -->
-      <section class="section active" id="overview">
-        <div class="stats">
-          <div class="stat"><div class="label">Total users</div><div class="val">1,284</div><div class="delta up">+18 this week</div></div>
-          <div class="stat"><div class="label">Blocked users</div><div class="val">7</div><div class="delta warn">+2 today</div></div>
-          <div class="stat"><div class="label">Scans run (24h)</div><div class="val">96</div><div class="delta">across 41 users</div></div>
-          <div class="stat"><div class="label">Threats flagged (24h)</div><div class="val">11</div><div class="delta warn">3 APK · 8 phishing</div></div>
+      <!-- STAT CARDS -->
+      <div class="stats">
+        <div class="stat">
+          <div class="label">Total users</div>
+          <div class="val">{{ total_users }}</div>
+          <div class="delta up">{{ active_users }} active</div>
         </div>
+        <div class="stat">
+          <div class="label">Blocked users</div>
+          <div class="val">{{ blocked_users }}</div>
+          <div class="delta warn">status = blocked</div>
+        </div>
+        <div class="stat">
+          <div class="label">Scans run (24h)</div>
+          <div class="val">{{ scans_24h }}</div>
+          <div class="delta">Network scans</div>
+        </div>
+        <div class="stat">
+          <div class="label">Threats flagged (24h)</div>
+          <div class="val">{{ total_threats }}</div>
+          <div class="delta warn">{{ apk_threats }} APK · {{ phishing_threats }} phishing</div>
+        </div>
+      </div>
 
-        <div class="panel">
-          <div class="panel-head"><h2>Recent activity</h2><span class="tag">last 6 events</span></div>
-          <table>
-            <thead><tr><th>Time</th><th>Event</th><th>User</th><th>Status</th></tr></thead>
-            <tbody id="activityBody"></tbody>
-          </table>
+      <!-- ==================== CHARTS ==================== -->
+      <div class="charts">
+        <div class="chart-card">
+          <h3>User Status Distribution</h3>
+          <div class="chart-wrap"><canvas id="userStatusChart"></canvas></div>
         </div>
-      </section>
+        <div class="chart-card">
+          <h3>Threats (Last 24h)</h3>
+          <div class="chart-wrap"><canvas id="threatsChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Weekly Activity Trend</h3>
+          <div class="chart-wrap"><canvas id="weeklyChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>Phishing vs Legitimate</h3>
+          <div class="chart-wrap"><canvas id="phishingChart"></canvas></div>
+        </div>
+      </div>
 
       <!-- ALL USERS -->
-      <section class="section" id="users">
-        <div class="panel">
-          <div class="panel-head"><h2>All registered users</h2><span class="tag">1,284 total</span></div>
-          <table>
-            <thead><tr><th>User</th><th>Email</th><th>Joined</th><th>Status</th><th></th></tr></thead>
-            <tbody id="usersBody"></tbody>
-          </table>
+      <div class="panel searchable-panel">
+        <div class="panel-head">
+          <h2>Registered Users</h2>
+          <span class="tag">{{ total_users }} total</span>
         </div>
-      </section>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Phone</th>
+              <th>Address</th>
+              <th>Status</th>
+              <th>Joined</th>
+            </tr>
+          </thead>
+          <tbody class="searchable-table">
+            {% for u in all_users %}
+            <tr>
+              <td class="strong">{{ u.name }}</td>
+              <td class="mono-cell">{{ u.phone }}</td>
+              <td>{{ u.Adress|truncatechars:30 }}</td>
+              <td>
+                <span class="badge {% if u.status|lower == 'blocked' %}bad{% elif u.status|lower == 'active' %}ok{% else %}neu{% endif %}">
+                  {{ u.status|default:"—" }}
+                </span>
+              </td>
+              <td class="mono-cell">{{ u.created_at|date:"d M Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="empty">No users registered yet</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="no-results">No matching users found</div>
+      </div>
 
-      <!-- BLOCKED USERS -->
-      <section class="section" id="blocked">
-        <div class="panel">
-          <div class="panel-head"><h2>Blocked users</h2><span class="tag">auto-blocked by DoS detection</span></div>
-          <table>
-            <thead><tr><th>User</th><th>Reason</th><th>Requests</th><th>Blocked at</th><th></th></tr></thead>
-            <tbody id="blockedBody"></tbody>
-          </table>
+      <!-- RECENT ACTIVITY -->
+      <div class="panel searchable-panel">
+        <div class="panel-head">
+          <h2>Recent activity</h2>
+          <span class="tag">latest events</span>
         </div>
-      </section>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Event</th>
+              <th>User</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody class="searchable-table">
+            {% for item in activity %}
+            <tr>
+              <td class="mono-cell">{{ item.time|date:"H:i:s" }}</td>
+              <td class="strong">{{ item.event }}</td>
+              <td class="mono-cell">{{ item.user }}</td>
+              <td><span class="badge {{ item.status_class }}">{{ item.status }}</span></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="empty">No recent activity</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="no-results">No matching activity found</div>
+      </div>
 
-      <!-- NETWORK SCAN LOGS -->
-      <section class="section" id="scanlogs">
-        <div class="panel">
-          <div class="panel-head"><h2>Network scan logs</h2><span class="tag">Nmap results</span></div>
-          <table>
-            <thead><tr><th>Target</th><th>User</th><th>Open ports</th><th>Flagged</th><th>Timestamp</th></tr></thead>
-            <tbody id="scanBody"></tbody>
-          </table>
+      <!-- NETWORK SCANS -->
+      <div class="panel searchable-panel">
+        <div class="panel-head">
+          <h2>Latest Network Scans</h2>
+          <span class="tag">Nmap results</span>
         </div>
-      </section>
+        <table>
+          <thead>
+            <tr>
+              <th>Target</th>
+              <th>User</th>
+              <th>Status</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody class="searchable-table">
+            {% for s in latest_scans %}
+            <tr>
+              <td class="mono-cell strong">{{ s.target_host }}</td>
+              <td class="mono-cell">{{ s.USER.name }}</td>
+              <td>
+                <span class="badge {% if s.status == 'Suspicious' %}warn{% else %}ok{% endif %}">
+                  {{ s.status|default:"Clean" }}
+                </span>
+              </td>
+              <td class="mono-cell">{{ s.timestamp|date:"d M Y H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="empty">No network scans yet</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="no-results">No matching scans found</div>
+      </div>
 
-      <!-- PHISHING LOGS -->
-      <section class="section" id="phishlogs">
-        <div class="panel">
-          <div class="panel-head"><h2>Phishing detection logs</h2><span class="tag">ML verdicts</span></div>
-          <table>
-            <thead><tr><th>URL</th><th>User</th><th>Verdict</th><th>Confidence</th><th>Timestamp</th></tr></thead>
-            <tbody id="phishBody"></tbody>
-          </table>
+      <!-- PHISHING -->
+      <div class="panel searchable-panel">
+        <div class="panel-head">
+          <h2>Latest Phishing Checks</h2>
+          <span class="tag">ML verdicts</span>
         </div>
-      </section>
+        <table>
+          <thead>
+            <tr>
+              <th>URL</th>
+              <th>User</th>
+              <th>Verdict</th>
+              <th>Confidence</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody class="searchable-table">
+            {% for p in latest_phish %}
+            <tr>
+              <td class="mono-cell strong">{{ p.url|truncatechars:40 }}</td>
+              <td class="mono-cell">{{ p.USER.name }}</td>
+              <td>
+                <span class="badge {% if p.result == 'PHISHING' %}bad{% else %}ok{% endif %}">
+                  {{ p.result|default:"—" }}
+                </span>
+              </td>
+              <td class="mono-cell">{{ p.probability|floatformat:1 }}%</td>
+              <td class="mono-cell">{{ p.created_at|date:"d M Y H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="empty">No phishing checks yet</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="no-results">No matching phishing logs found</div>
+      </div>
 
-      <!-- APK LOGS -->
-      <section class="section" id="apklogs">
-        <div class="panel">
-          <div class="panel-head"><h2>APK scan logs</h2><span class="tag">Sandbox + ML verdicts</span></div>
-          <table>
-            <thead><tr><th>File</th><th>User</th><th>Sandbox</th><th>Verdict</th><th>Timestamp</th></tr></thead>
-            <tbody id="apkBody"></tbody>
-          </table>
+      <!-- APK -->
+      <div class="panel searchable-panel">
+        <div class="panel-head">
+          <h2>Latest APK Scans</h2>
+          <span class="tag">Sandbox + ML</span>
         </div>
-      </section>
-
-      <!-- COMPLAINTS -->
-      <section class="section" id="complaints">
-        <div class="panel">
-          <div class="panel-head"><h2>Complaints</h2><span class="tag">4 open</span></div>
-          <table>
-            <thead><tr><th>User</th><th>Subject</th><th>Status</th><th>Submitted</th><th></th></tr></thead>
-            <tbody id="complaintsBody"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- FEEDBACK -->
-      <section class="section" id="feedback">
-        <div class="panel">
-          <div class="panel-head"><h2>Feedback</h2><span class="tag">latest submissions</span></div>
-          <table>
-            <thead><tr><th>User</th><th>Rating</th><th>Comment</th><th>Submitted</th></tr></thead>
-            <tbody id="feedbackBody"></tbody>
-          </table>
-        </div>
-      </section>
+        <table>
+          <thead>
+            <tr>
+              <th>File</th>
+              <th>User</th>
+              <th>Verdict</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody class="searchable-table">
+            {% for a in latest_apks %}
+            <tr>
+              <td class="strong">{{ a.apk_file.name|default:"—" }}</td>
+              <td class="mono-cell">{{ a.USER.name }}</td>
+              <td>
+                {% with pred=a.prediction_result|upper %}
+                  {% if "CRITICAL MALWARE" in pred %}
+                    <span class="badge bad">Critical Malware</span>
+                  {% elif "SUSPICIOUS" in pred %}
+                    <span class="badge warn">Suspicious</span>
+                  {% else %}
+                    <span class="badge ok">Safe</span>
+                  {% endif %}
+                {% endwith %}
+              </td>
+              <td class="mono-cell">{{ a.timestamp|date:"d M Y H:i" }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="empty">No APK scans yet</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="no-results">No matching APK scans found</div>
+      </div>
 
     </div>
   </div>
 </div>
 
 <script>
-const titles = {
-  overview:['Dashboard','Platform overview'],
-  users:['All users','1,284 registered accounts'],
-  blocked:['Blocked users','Accounts auto-blocked by DoS detection'],
-  scanlogs:['Network scan logs','Nmap scan history across all users'],
-  phishlogs:['Phishing detection logs','URL submissions and ML verdicts'],
-  apklogs:['APK scan logs','Sandbox-verified malware analysis results'],
-  complaints:['Complaints','User-submitted issues'],
-  feedback:['Feedback','User ratings and comments'],
-};
+// ---------- Chart.js setup ----------
+const teal = '#3FC7B0';
+const red = '#E5484D';
+const amber = '#E5A73F';
+const muted = '#7E93A7';
+const gridColor = 'rgba(38,52,68,0.4)';
 
-document.querySelectorAll('.navlink').forEach(link=>{
-  link.addEventListener('click',()=>{
-    document.querySelectorAll('.navlink').forEach(l=>l.classList.remove('active'));
-    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-    link.classList.add('active');
-    const t = link.dataset.target;
-    document.getElementById(t).classList.add('active');
-    document.getElementById('pageTitle').textContent = titles[t][0];
-    document.getElementById('pageSub').textContent = titles[t][1];
-  });
+Chart.defaults.color = muted;
+Chart.defaults.borderColor = gridColor;
+Chart.defaults.font.family = "'Sora', system-ui, sans-serif";
+
+// 1. User Status Doughnut
+const userStatusData = {{ chart_user_status|safe }};
+new Chart(document.getElementById('userStatusChart'), {
+  type: 'doughnut',
+  data: {
+    labels: userStatusData.labels,
+    datasets: [{
+      data: userStatusData.data,
+      backgroundColor: [teal, red, muted],
+      borderWidth: 0,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14 } } }
+  }
 });
 
-function badge(text,type){ return `<span class="badge ${type}">${text}</span>`; }
+// 2. Threats Doughnut
+const threatsData = {{ chart_threats|safe }};
+new Chart(document.getElementById('threatsChart'), {
+  type: 'doughnut',
+  data: {
+    labels: threatsData.labels,
+    datasets: [{
+      data: threatsData.data,
+      backgroundColor: [red, amber, teal],
+      borderWidth: 0,
+      hoverOffset: 6
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14 } } }
+  }
+});
 
-// Recent activity
-const activity = [
-  ['09:41:02','DoS block','user_882', badge('blocked','bad')],
-  ['09:22:15','APK scan','user_204', badge('harmful','bad')],
-  ['08:58:40','Phishing check','user_119', badge('legitimate','ok')],
-  ['08:40:11','Network scan','user_054', badge('2 flagged','warn')],
-  ['08:12:37','Phishing check','user_301', badge('phishing','bad')],
-  ['07:55:09','APK scan','user_178', badge('safe','ok')],
-];
-document.getElementById('activityBody').innerHTML = activity.map(r=>
-  `<tr><td class="mono-cell">${r[0]}</td><td class="strong">${r[1]}</td><td class="mono-cell">${r[2]}</td><td>${r[3]}</td></tr>`).join('');
+// 3. Weekly Activity Line
+const weeklyData = {{ chart_weekly|safe }};
+new Chart(document.getElementById('weeklyChart'), {
+  type: 'line',
+  data: {
+    labels: weeklyData.labels,
+    datasets: [
+      {
+        label: 'Network',
+        data: weeklyData.network,
+        borderColor: teal,
+        backgroundColor: 'rgba(63,199,176,0.12)',
+        fill: true,
+        tension: 0.35,
+        pointRadius: 3
+      },
+      {
+        label: 'Phishing',
+        data: weeklyData.phishing,
+        borderColor: red,
+        backgroundColor: 'transparent',
+        tension: 0.35,
+        pointRadius: 3
+      },
+      {
+        label: 'APK',
+        data: weeklyData.apk,
+        borderColor: amber,
+        backgroundColor: 'transparent',
+        tension: 0.35,
+        pointRadius: 3
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 14 } } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, ticks: { stepSize: 1 } }
+    }
+  }
+});
 
-// Users
-const users = [
-  ['Aditi Menon','aditi.menon@mail.com','12 Mar 2026','active'],
-  ['Rahul Nair','rahul.nair@mail.com','04 Apr 2026','active'],
-  ['Sana Iqbal','sana.iqbal@mail.com','19 Apr 2026','active'],
-  ['Vikram Das','vikram.das@mail.com','01 May 2026','blocked'],
-  ['Priya Suresh','priya.suresh@mail.com','22 May 2026','active'],
-  ['Farhan Ali','farhan.ali@mail.com','09 Jun 2026','active'],
-];
-document.getElementById('usersBody').innerHTML = users.map(u=>
-  `<tr><td class="strong">${u[0]}</td><td class="mono-cell">${u[1]}</td><td>${u[2]}</td><td>${badge(u[3], u[3]==='active'?'ok':'bad')}</td>
-   <td><button class="rowbtn">View</button></td></tr>`).join('');
+// 4. Phishing vs Legitimate
+const phishingData = {{ chart_phishing|safe }};
+new Chart(document.getElementById('phishingChart'), {
+  type: 'bar',
+  data: {
+    labels: phishingData.labels,
+    datasets: [{
+      data: phishingData.data,
+      backgroundColor: [red, teal],
+      borderRadius: 6,
+      borderSkipped: false
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { display: false } },
+      y: { beginAtZero: true, ticks: { stepSize: 1 } }
+    }
+  }
+});
 
-// Blocked
-const blocked = [
-  ['user_882','Request rate exceeded','312 / 60s','Today, 09:41'],
-  ['user_640','Request rate exceeded','287 / 60s','Today, 07:12'],
-  ['user_205','Repeated failed scans','198 / 60s','Yesterday, 22:04'],
-  ['vikram_das','Request rate exceeded','266 / 60s','Yesterday, 18:30'],
-];
-document.getElementById('blockedBody').innerHTML = blocked.map(b=>
-  `<tr><td class="strong">${b[0]}</td><td>${b[1]}</td><td class="mono-cell">${b[2]}</td><td class="mono-cell">${b[3]}</td>
-   <td><button class="rowbtn">Unblock</button></td></tr>`).join('');
+// ---------- jQuery Search ----------
+$(document).ready(function() {
+  $('#globalSearch').on('keyup', function() {
+    var value = $(this).val().toLowerCase().trim();
 
-// Scan logs
-const scans = [
-  ['10.0.4.12','user_054','22, 80, 443','No', '09:12'],
-  ['10.0.4.19','user_054','23, 445','Yes — telnet open','09:14'],
-  ['192.168.1.8','user_301','80, 443, 3306','Yes — db port exposed','08:50'],
-  ['10.0.6.4','user_178','22','No','08:20'],
-];
-document.getElementById('scanBody').innerHTML = scans.map(s=>
-  `<tr><td class="mono-cell strong">${s[0]}</td><td class="mono-cell">${s[1]}</td><td class="mono-cell">${s[2]}</td>
-   <td>${s[3]==='No'?badge('none','ok'):badge(s[3],'warn')}</td><td class="mono-cell">${s[4]}</td></tr>`).join('');
+    $('.searchable-panel').each(function() {
+      var $panel = $(this);
+      var $rows = $panel.find('.searchable-table tr');
+      var visibleCount = 0;
 
-// Phishing logs
-const phish = [
-  ['secure-login-paypa1.com','user_301',badge('phishing','bad'),'96.2%','08:12'],
-  ['shieldnet.io/login','user_119',badge('legitimate','ok'),'99.1%','08:58'],
-  ['bit.ly/3xQzT','user_640',badge('phishing','bad'),'88.4%','07:44'],
-  ['github.com','user_054',badge('legitimate','ok'),'99.8%','06:30'],
-];
-document.getElementById('phishBody').innerHTML = phish.map(p=>
-  `<tr><td class="mono-cell strong">${p[0]}</td><td class="mono-cell">${p[1]}</td><td>${p[2]}</td><td class="mono-cell">${p[3]}</td><td class="mono-cell">${p[4]}</td></tr>`).join('');
+      $rows.each(function() {
+        var rowText = $(this).text().toLowerCase();
+        if (value === '' || rowText.indexOf(value) > -1) {
+          $(this).show();
+          visibleCount++;
+        } else {
+          $(this).hide();
+        }
+      });
 
-// APK logs
-const apks = [
-  ['fitness_tracker.apk','user_204','Executed 42s',badge('harmful','bad'),'09:22'],
-  ['photo_editor.apk','user_178','Executed 38s',badge('safe','ok'),'07:55'],
-  ['wallet_pro.apk','user_640','Executed 51s',badge('harmful','bad'),'Yesterday, 21:10'],
-  ['flashlight.apk','user_119','Executed 29s',badge('safe','ok'),'Yesterday, 16:04'],
-];
-document.getElementById('apkBody').innerHTML = apks.map(a=>
-  `<tr><td class="strong">${a[0]}</td><td class="mono-cell">${a[1]}</td><td class="mono-cell">${a[2]}</td><td>${a[3]}</td><td class="mono-cell">${a[4]}</td></tr>`).join('');
-
-// Complaints
-const complaints = [
-  ['Sana Iqbal','Scan results not loading',badge('open','warn'),'Today, 08:02'],
-  ['Vikram Das','Blocked without warning',badge('open','warn'),'Yesterday, 19:40'],
-  ['Rahul Nair','APK upload stuck at 90%',badge('in review','neu'),'2 days ago'],
-  ['Farhan Ali','False phishing flag',badge('resolved','ok'),'3 days ago'],
-];
-document.getElementById('complaintsBody').innerHTML = complaints.map(c=>
-  `<tr><td class="strong">${c[0]}</td><td>${c[1]}</td><td>${c[2]}</td><td class="mono-cell">${c[3]}</td>
-   <td><button class="rowbtn">Reply</button></td></tr>`).join('');
-
-// Feedback
-const feedback = [
-  ['Priya Suresh','★★★★★','Sandbox verdicts feel trustworthy and fast.','Today, 09:00'],
-  ['Aditi Menon','★★★★☆','Wish scan history could be exported.','Yesterday, 14:22'],
-  ['Farhan Ali','★★★☆☆','Blocking threshold felt a bit aggressive.','3 days ago'],
-];
-document.getElementById('feedbackBody').innerHTML = feedback.map(f=>
-  `<tr><td class="strong">${f[0]}</td><td class="mono-cell">${f[1]}</td><td>${f[2]}</td><td class="mono-cell">${f[3]}</td></tr>`).join('');
+      if (value !== '' && visibleCount === 0) {
+        $panel.find('.no-results').show();
+      } else {
+        $panel.find('.no-results').hide();
+      }
+    });
+  });
+});
 </script>
+
 </body>
 </html>

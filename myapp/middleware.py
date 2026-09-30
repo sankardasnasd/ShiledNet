@@ -7,7 +7,6 @@ from .models import User_data, Dos_detection_table
 
 
 def render_dos_blocked_page(title, message, incident_code="ERR_SEC_DOS_403"):
-    """ShieldNet SOC Themed 403 Forbidden Quarantine Page with Auto-Logout Button"""
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -182,7 +181,6 @@ class DosProtectionMiddleware(MiddlewareMixin):
     TIME_WINDOW = 10  # 10 Seconds
     THRESHOLD = 20  # Max Requests per Window
 
-    # ഈ പാത്തുകൾക്ക് DoS മിഡിൽവെയർ ബ്ലോക്ക് ബാധകമാകില്ല
     EXEMPT_PATHS = [
         '/static/',
         '/media/',
@@ -192,12 +190,10 @@ class DosProtectionMiddleware(MiddlewareMixin):
     ]
 
     def process_request(self, request):
-        # 1. ലോഗിൻ, ലോഗൗട്ട്, സ്റ്റാറ്റിക് പാത്തുകൾ ഒഴിവാക്കുന്നു
         for path in self.EXEMPT_PATHS:
             if request.path.startswith(path):
                 return None
 
-        # 2. അഡ്മിൻ അല്ലെങ്കിൽ സ്റ്റാഫ് ആണെങ്കിൽ DoS ബ്ലോക്ക് ഒഴിവാക്കുന്നു
         if request.user.is_authenticated and (request.user.is_superuser or request.user.is_staff):
             return None
 
@@ -206,7 +202,6 @@ class DosProtectionMiddleware(MiddlewareMixin):
         if request.user.is_authenticated:
             try:
                 user_data_obj = User_data.objects.get(LOGIN_id=request.user.id)
-                # യൂസർ ഓൾറെഡി ബ്ലോക്ക് ആണെങ്കിൽ സെഷൻ ഉടൻ ഡിലീറ്റ് ചെയ്ത് ക്വാറന്റൈൻ പേജ് നൽകുന്നു
                 if user_data_obj.status == 'blocked':
                     logout(request)
                     return render_dos_blocked_page(
@@ -226,7 +221,6 @@ class DosProtectionMiddleware(MiddlewareMixin):
         history.append(now)
         cache.set(cache_key, history, timeout=self.TIME_WINDOW + 2)
 
-        # ത്രെഷോൾഡ് കവിഞ്ഞാൽ (DoS അറ്റാക്ക് നടന്നാൽ)
         if len(history) > self.THRESHOLD and user_data_obj:
             if user_data_obj.status != 'blocked':
                 user_data_obj.status = 'blocked'

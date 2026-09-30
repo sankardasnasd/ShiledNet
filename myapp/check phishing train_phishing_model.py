@@ -23,7 +23,7 @@ from sklearn.metrics import (
 # CONFIGURATION
 # ============================================================
 
-DATASET_PATH = r"C:\Users\GAYATHRI\Downloads\Shieldnet main\PhiUSIIL_Phishing_URL_Dataset.csv"
+DATASET_PATH = r"C:\Users\GAYATHRI\PycharmProjects\SHIELDNET\PhiUSIIL_Phishing_URL_Dataset.csv"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 

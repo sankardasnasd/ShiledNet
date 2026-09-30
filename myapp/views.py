@@ -5,8 +5,86 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, login, logout
 from .middleware import render_dos_blocked_page
 
+from django.shortcuts import render
+from django.db.models import Q
+import re
+
+
+
 def public_home(request):
-    return render(request,'public page.html')
+    total_scans = Network_Scan_table.objects.count()
+    latest_scan = Network_Scan_table.objects.order_by('-timestamp').first()
+
+    open_ports = "—"
+    if latest_scan and latest_scan.scanresult:
+        match = re.search(r'(\d+)\s*(?:open|ports?)', latest_scan.scanresult, re.I)
+        open_ports = match.group(1) if match else "N/A"
+
+    suspicious_count = Network_Scan_table.objects.filter(status__iexact='Suspicious').count()
+
+    if latest_scan and latest_scan.status:
+        network_status = latest_scan.status          # "Suspicious"
+    else:
+        network_status = "Clean"
+
+
+    phishing_qs = PhishingDetection.objects.all()
+    total_phishing = phishing_qs.count()
+    phishing_count = phishing_qs.filter(result__iexact='PHISHING').count()
+    legitimate_count = phishing_qs.filter(result__iexact='LEGITIMATE').count()
+
+    latest_phish = phishing_qs.order_by('-created_at').first()
+    if latest_phish and latest_phish.result:
+        phishing_status = latest_phish.result.upper()   # PHISHING / LEGITIMATE
+    else:
+        phishing_status = "No Data"
+
+
+    apk_qs = Apk_File_table.objects.all()
+    total_apks = apk_qs.count()
+    latest_apk = apk_qs.order_by('-timestamp').first()
+
+    apk_verdict = "Safe"
+    if latest_apk and latest_apk.prediction_result:
+        pred = latest_apk.prediction_result.upper()
+        if "CRITICAL MALWARE" in pred:
+            apk_verdict = "Critical Malware"
+        elif "SUSPICIOUS" in pred:
+            apk_verdict = "Suspicious"
+
+    dos_qs = Dos_detection_table.objects.all()
+    total_dos = dos_qs.count()
+    blocked = dos_qs.filter(
+        Q(prediction_result__icontains='block') |
+        Q(prediction_result__icontains='attack')
+    ).count()
+
+    if blocked > 0:
+        request_rate_status = "Attack Detected"
+    elif total_dos > 10:
+        request_rate_status = "Elevated"
+    else:
+        request_rate_status = "Monitoring"
+
+    context = {
+        'open_ports': open_ports,
+        'network_status': network_status,
+        'suspicious_scans': suspicious_count,
+        'phishing_status': phishing_status,
+        'phishing_count': phishing_count,
+        'legitimate_count': legitimate_count,
+        'apk_verdict': apk_verdict,
+        'request_rate_status': request_rate_status,
+        'sandbox_status': 'Isolated',
+        'total_scans': total_scans,
+        'total_phishing': total_phishing,
+        'total_apks': total_apks,
+        'total_dos_alerts': total_dos,
+    }
+    return render(request, 'public page.html', context)
+
+
+
 
 @csrf_exempt
 def login_page(request):
@@ -212,12 +290,161 @@ SHIELDNET Security Team
     )
 
 
+import re
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.db.models import Q, Count
+from django.utils import timezone
+from datetime import timedelta
+import json
+
+
+
+
 @login_required(login_url='/myapp/login_page/')
-
 def admin_home(request):
-    return render(request,'admin/admim home.html')
+    now = timezone.now()
+    last_24h = now - timedelta(hours=24)
+    last_7d = now - timedelta(days=7)
 
+    # ---------- Users ----------
+    all_users = User_data.objects.select_related('LOGIN').order_by('-created_at')
+    total_users = all_users.count()
+    blocked_users = all_users.filter(status__iexact='blocked').count()
+    active_users = all_users.filter(status__iexact='active').count()
 
+    # ---------- Scans (last 24h) ----------
+    scans_24h = Network_Scan_table.objects.filter(timestamp__gte=last_24h).count()
+
+    # ---------- Threats ----------
+    phishing_threats = PhishingDetection.objects.filter(
+        created_at__gte=last_24h, result__iexact='PHISHING'
+    ).count()
+    apk_threats = Apk_File_table.objects.filter(
+        timestamp__gte=last_24h
+    ).filter(
+        Q(prediction_result__icontains='CRITICAL MALWARE') |
+        Q(prediction_result__icontains='SUSPICIOUS')
+    ).count()
+    total_threats = phishing_threats + apk_threats
+
+    # ---------- Chart Data ----------
+    # 1. User status pie
+    chart_user_status = {
+        'labels': ['Active', 'Blocked', 'Other'],
+        'data': [
+            active_users,
+            blocked_users,
+            max(0, total_users - active_users - blocked_users)
+        ]
+    }
+
+    # 2. Threat types (24h)
+    chart_threats = {
+        'labels': ['Phishing', 'APK Threats', 'Clean'],
+        'data': [
+            phishing_threats,
+            apk_threats,
+            max(0, scans_24h + phishing_threats + apk_threats - total_threats)
+        ]
+    }
+
+    # 3. Last 7 days activity (scans + phishing + apk per day)
+    days = []
+    network_counts = []
+    phishing_counts = []
+    apk_counts = []
+
+    for i in range(6, -1, -1):
+        day = (now - timedelta(days=i)).date()
+        days.append(day.strftime('%d %b'))
+
+        network_counts.append(
+            Network_Scan_table.objects.filter(timestamp__date=day).count()
+        )
+        phishing_counts.append(
+            PhishingDetection.objects.filter(created_at__date=day).count()
+        )
+        apk_counts.append(
+            Apk_File_table.objects.filter(timestamp__date=day).count()
+        )
+
+    chart_weekly = {
+        'labels': days,
+        'network': network_counts,
+        'phishing': phishing_counts,
+        'apk': apk_counts,
+    }
+
+    # 4. Phishing vs Legitimate overall
+    total_phish = PhishingDetection.objects.filter(result__iexact='PHISHING').count()
+    total_legit = PhishingDetection.objects.filter(result__iexact='LEGITIMATE').count()
+    chart_phishing = {
+        'labels': ['Phishing', 'Legitimate'],
+        'data': [total_phish, total_legit]
+    }
+
+    # ---------- Latest tables ----------
+    latest_scans = Network_Scan_table.objects.select_related('USER').order_by('-timestamp')[:8]
+    latest_phish = PhishingDetection.objects.select_related('USER').order_by('-created_at')[:8]
+    latest_apks = Apk_File_table.objects.select_related('USER').order_by('-timestamp')[:8]
+
+    # ---------- Activity ----------
+    activity = []
+    for s in Network_Scan_table.objects.select_related('USER').order_by('-timestamp')[:5]:
+        activity.append({
+            'time': s.timestamp,
+            'event': 'Network scan',
+            'user': s.USER.name if s.USER else str(s.USER),
+            'status': s.status or 'Clean',
+            'status_class': 'warn' if s.status and s.status.lower() == 'suspicious' else 'ok'
+        })
+    for p in PhishingDetection.objects.select_related('USER').order_by('-created_at')[:5]:
+        activity.append({
+            'time': p.created_at,
+            'event': 'Phishing check',
+            'user': p.USER.name if p.USER else str(p.USER),
+            'status': p.result or '—',
+            'status_class': 'bad' if p.result and p.result.upper() == 'PHISHING' else 'ok'
+        })
+    for a in Apk_File_table.objects.select_related('USER').order_by('-timestamp')[:5]:
+        pred = (a.prediction_result or '').upper()
+        if 'CRITICAL MALWARE' in pred:
+            status, cls = 'Critical Malware', 'bad'
+        elif 'SUSPICIOUS' in pred:
+            status, cls = 'Suspicious', 'warn'
+        else:
+            status, cls = 'Safe', 'ok'
+        activity.append({
+            'time': a.timestamp,
+            'event': 'APK scan',
+            'user': a.USER.name if a.USER else str(a.USER),
+            'status': status,
+            'status_class': cls
+        })
+    activity = sorted(activity, key=lambda x: x['time'], reverse=True)[:8]
+
+    context = {
+        'total_users': total_users,
+        'active_users': active_users,
+        'blocked_users': blocked_users,
+        'scans_24h': scans_24h,
+        'total_threats': total_threats,
+        'phishing_threats': phishing_threats,
+        'apk_threats': apk_threats,
+        'all_users': all_users[:20],
+        'latest_scans': latest_scans,
+        'latest_phish': latest_phish,
+        'latest_apks': latest_apks,
+        'activity': activity,
+
+        # Chart data (JSON safe)
+        'chart_user_status': json.dumps(chart_user_status),
+        'chart_threats': json.dumps(chart_threats),
+        'chart_weekly': json.dumps(chart_weekly),
+        'chart_phishing': json.dumps(chart_phishing),
+    }
+    return render(request, 'admin/admim home.html', context)
 
 @login_required(login_url='/myapp/login_page/')
 
@@ -238,7 +465,7 @@ from django.shortcuts import redirect
 from .models import User_data
 
 def admin_unblock_users(request, id):
-    User_data.objects.filter(id=id).update(status='active')
+    User_data.objects.filter(id=id).update(status='Active')
     cache.delete(f"dos_track_user_{id}")
     messages.success(request, "User unblocked successfully.")
     return redirect('/myapp/admin_view_users/#a')
@@ -291,10 +518,93 @@ def admin_view_apk_scan_logs(request):
 
 
 # user===============================
-@login_required(login_url='/myapp/login_page/')
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
+from django.db.models import Q
+import re
 
+from .models import (
+    User_data,
+    Network_Scan_table,
+    Dos_detection_table,
+    PhishingDetection,
+    Apk_File_table,
+)
+
+
+@login_required(login_url='/myapp/login_page/')
 def userhome(request):
-    return render(request,'user/userhome.html')
+    try:
+        user_profile = User_data.objects.get(LOGIN=request.user)
+    except User_data.DoesNotExist:
+        user_profile = None
+
+    # Defaults
+    open_ports = "—"
+    network_status = "Clean"
+    phishing_status = "No Data"
+    apk_verdict = "Safe"
+    request_rate_status = "Monitoring"
+    sandbox_status = "Isolated"
+    total_scans = 0
+    total_phishing = 0
+    total_apks = 0
+
+    if user_profile:
+        user_scans = Network_Scan_table.objects.filter(USER=user_profile)
+        user_phish = PhishingDetection.objects.filter(USER=user_profile)
+        user_apks = Apk_File_table.objects.filter(USER=user_profile)
+        user_dos = Dos_detection_table.objects.filter(USER=user_profile)
+
+        total_scans = user_scans.count()
+        total_phishing = user_phish.count()
+        total_apks = user_apks.count()
+
+        # Latest Network Scan
+        latest_scan = user_scans.order_by('-timestamp').first()
+        if latest_scan:
+            if latest_scan.scanresult:
+                match = re.search(r'(\d+)\s*(?:open|ports?)', latest_scan.scanresult, re.I)
+                open_ports = match.group(1) if match else "N/A"
+            network_status = latest_scan.status or "Clean"
+
+        # Latest Phishing
+        latest_phish = user_phish.order_by('-created_at').first()
+        if latest_phish and latest_phish.result:
+            phishing_status = latest_phish.result.upper()
+
+        # Latest APK
+        latest_apk = user_apks.order_by('-timestamp').first()
+        if latest_apk and latest_apk.prediction_result:
+            pred = latest_apk.prediction_result.upper()
+            if "CRITICAL MALWARE" in pred:
+                apk_verdict = "Critical Malware"
+            elif "SUSPICIOUS" in pred:
+                apk_verdict = "Suspicious"
+
+        # DoS / Request Rate
+        blocked = user_dos.filter(
+            Q(prediction_result__icontains='block') |
+            Q(prediction_result__icontains='attack')
+        ).count()
+        if blocked > 0:
+            request_rate_status = "Attack Detected"
+        elif user_dos.count() > 5:
+            request_rate_status = "Elevated"
+
+    context = {
+        'user_profile': user_profile,
+        'open_ports': open_ports,
+        'network_status': network_status,
+        'phishing_status': phishing_status,
+        'apk_verdict': apk_verdict,
+        'request_rate_status': request_rate_status,
+        'sandbox_status': sandbox_status,
+        'total_scans': total_scans,
+        'total_phishing': total_phishing,
+        'total_apks': total_apks,
+    }
+    return render(request, 'user/userhome.html', context)
 
 @login_required(login_url='/myapp/login_page/')
 
@@ -906,3 +1216,71 @@ def network_scan(request):
         request,
         'user/network_scan.html'
     )
+
+
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
+
+from .models import User_data, Chat_table
+
+
+@login_required
+def all_users(request):
+
+    users = User_data.objects.exclude(
+        LOGIN=request.user
+    )
+
+    return render(
+        request,
+        'user/all_users.html',
+        {
+            'users': users
+        }
+    )
+
+
+def user_chat_to_user(request, id):
+    request.session["userid"] = id
+    cid = str(request.session["userid"])
+    request.session["new"] = cid
+    qry = User_data.objects.get(LOGIN=cid)
+    print(qry.LOGIN.id,'login----------')
+
+    return render(request, "user/Chat.html", { 'name': qry.name, 'toid': cid})
+
+
+def chat_view(request):
+    fromid = request.user.id
+    toid = request.session["userid"]
+    qry = User_data.objects.get(LOGIN_id=request.session["userid"])
+    from django.db.models import Q
+
+    res = Chat_table.objects.filter(Q(FROM_id=fromid, TO_id=toid) | Q(FROM_id=toid, TO_id=fromid)).order_by('id')
+    l = []
+    print(qry.name,'userssssssssss')
+
+    for i in res:
+        l.append({"id": i.id, "message": i.chat, "to": i.TO_id, "date": i.timestamp, "from": i.FROM_id})
+
+    return JsonResponse({ "data": l, 'name': qry.name, 'toid': request.session["userid"]})
+
+
+def chat_send(request, msg):
+    lid = request.user.id
+    toid = request.session["userid"]
+    message = msg
+
+    import datetime
+    d = datetime.datetime.now().date()
+    chatobt = Chat_table()
+    chatobt.chat = message
+    chatobt.TO_id = toid
+    chatobt.FROM_id = lid
+    chatobt.timestamp = d
+    chatobt.save()
+
+    return JsonResponse({"status": "ok"})

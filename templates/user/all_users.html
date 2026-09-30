@@ -1,10 +1,173 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'user/userhome2.html' %}
+
+{% block body %}
+
+<div class="container-fluid py-4">
+
+    <div class="card shadow-sm">
+
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">
+                All Users
+            </h4>
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table id="usersTable"
+                       class="table table-bordered table-hover align-middle">
+
+                    <thead class="table-light">
+
+                        <tr>
+
+                            <th>#</th>
+
+                            <th>Name</th>
+
+                            <th>Username</th>
+
+                            <th>Phone</th>
+
+                            <th>Status</th>
+
+                            <th>Address</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        {% for user in users %}
+
+                        <tr>
+
+                            <td>
+                                {{ forloop.counter }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ user.name }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ user.LOGIN.username }}
+                            </td>
+
+                            <td>
+                                {{ user.phone }}
+                            </td>
+
+                            <td>
+
+                                {% if user.status == "Active" %}
+
+                                    <span class="badge bg-success">
+                                        Active
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge bg-secondary">
+                                        {{ user.status }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+                                {{ user.Adress }}
+                            </td>
+
+                            <td>
+
+                                <a href="{% url 'user_chat_to_user' user.LOGIN.id %}"
+                                   class="btn btn-primary btn-sm">
+
+                                    💬 Chat
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- jQuery -->
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+
+<!-- DataTables CSS -->
+
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/2.3.4/css/dataTables.dataTables.min.css">
+
+
+<!-- DataTables JS -->
+
+<script src="https://cdn.datatables.net/2.3.4/js/dataTables.min.js"></script>
+
+
+<script>
+
+    $(document).ready(function () {
+
+        $('#usersTable').DataTable({
+
+            pageLength: 10,
+
+            lengthMenu: [
+                [5, 10, 25, 50, -1],
+                [5, 10, 25, 50, "All"]
+            ],
+
+            ordering: true,
+
+            searching: true,
+
+            responsive: true,
+
+            language: {
+
+                search: "Search Users:",
+
+                lengthMenu: "Show _MENU_ users",
+
+                info: "Showing _START_ to _END_ of _TOTAL_ users",
+
+                emptyTable: "No users found",
+
+                zeroRecords: "No matching users found"
+
+            }
+
+        });
+
+    });
+
+</script>
+
+{% endblock %}

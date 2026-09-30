@@ -210,7 +210,7 @@
       font-size: 0.88rem;
     }
 
-    /* Dashboard preview */
+    /* Dashboard */
     .dashboard {
       background: linear-gradient(160deg, rgba(16, 26, 44, 0.95), rgba(7, 11, 20, 0.95));
       border: 1px solid var(--border);
@@ -261,12 +261,25 @@
     }
 
     .mini-card strong {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
     }
 
     .safe { color: var(--accent-2); }
     .warn { color: #fbbf24; }
-    .bad { color: var(--danger); }
+    .bad  { color: var(--danger); }
+
+    .summary-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .summary-row strong {
+      color: var(--accent);
+    }
 
     /* Sections */
     section {
@@ -538,7 +551,7 @@
           </p>
 
           <div class="hero-actions">
-            <a class="btn btn-primary" href="">Create Free Account</a>
+            <a class="btn btn-primary" href="/myapp/user_register/#a">Create Free Account</a>
             <a class="btn btn-outline" href="#features">Explore Features</a>
           </div>
 
@@ -558,6 +571,7 @@
           </div>
         </div>
 
+        <!-- ==================== LIVE DASHBOARD ==================== -->
         <div class="dashboard">
           <div class="dashboard-top">
             <h3>ShieldNet Security Dashboard</h3>
@@ -565,44 +579,65 @@
           </div>
 
           <div class="dashboard-grid">
+
             <div class="mini-card">
               <span>Network Scan</span>
-              <strong>18 Open Ports</strong>
+              <strong>{{ open_ports }} Open Ports</strong>
             </div>
 
             <div class="mini-card">
-              <span>Active Services</span>
-              <strong>7 Detected</strong>
+              <span>Network Status</span>
+              <strong class="{% if network_status == 'Suspicious' %}warn{% else %}safe{% endif %}">
+                {{ network_status|default:"Clean" }}
+              </strong>
             </div>
 
             <div class="mini-card">
               <span>Phishing URL Check</span>
-              <strong class="bad">High Risk</strong>
+              <strong class="{% if phishing_status == 'PHISHING' %}bad{% else %}safe{% endif %}">
+                {{ phishing_status|default:"No Data" }}
+              </strong>
             </div>
 
             <div class="mini-card">
               <span>APK Verdict</span>
-              <strong class="safe">Safe</strong>
+              <strong class="{% if apk_verdict == 'Critical Malware' %}bad{% elif apk_verdict == 'Suspicious' %}warn{% else %}safe{% endif %}">
+                {{ apk_verdict|default:"Safe" }}
+              </strong>
             </div>
 
             <div class="mini-card">
               <span>Request Rate</span>
-              <strong class="warn">Monitoring</strong>
+              <strong class="{% if 'attack' in request_rate_status|lower %}bad{% elif 'elevated' in request_rate_status|lower %}warn{% else %}safe{% endif %}">
+                {{ request_rate_status|default:"Monitoring" }}
+              </strong>
             </div>
 
             <div class="mini-card">
               <span>Sandbox Status</span>
-              <strong class="safe">Isolated</strong>
+              <strong class="safe">{{ sandbox_status|default:"Isolated" }}</strong>
             </div>
+
+          </div>
+
+          <div class="summary-row">
+            <span>Total Scans: <strong>{{ total_scans|default:0 }}</strong></span>
+            <span>Suspicious: <strong style="color:#fbbf24">{{ suspicious_scans|default:0 }}</strong></span>
+            <span>Phishing: <strong style="color:var(--danger)">{{ phishing_count|default:0 }}</strong></span>
+            <span>Legitimate: <strong style="color:var(--accent-2)">{{ legitimate_count|default:0 }}</strong></span>
+            <span>APK Analyses: <strong>{{ total_apks|default:0 }}</strong></span>
+            <span>DoS Alerts: <strong>{{ total_dos_alerts|default:0 }}</strong></span>
           </div>
         </div>
+        <!-- ==================== END LIVE DASHBOARD ==================== -->
+
       </div>
     </section>
 
-      <div id="a" class="container">
-          {% block body %}
-          {% endblock %}
-      </div>
+    <div id="a" class="container">
+      {% block body %}
+      {% endblock %}
+    </div>
 
     <section id="features">
       <div class="container">

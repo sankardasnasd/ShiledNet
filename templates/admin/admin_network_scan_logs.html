@@ -37,6 +37,103 @@
         background: #1A2535 !important; color: #E8EDF2 !important; border: 1px solid #263444 !important;
     }
     .dataTables_wrapper .dataTables_paginate .paginate_button.disabled { color: #4A5A6A !important; }
+
+    /* Modal styles */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.65);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+        background: #141E2B;
+        border: 1px solid #263444;
+        border-radius: 14px;
+        width: 100%;
+        max-width: 680px;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        font-family: 'Sora', system-ui, sans-serif;
+    }
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px;
+        border-bottom: 1px solid #263444;
+    }
+    .modal-header h3 {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 600;
+        color: #E8EDF2;
+    }
+    .modal-close {
+        background: transparent;
+        border: none;
+        color: #7E93A7;
+        font-size: 22px;
+        cursor: pointer;
+        line-height: 1;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+    .modal-close:hover { background: #1A2535; color: #E8EDF2; }
+    .modal-body { padding: 22px; }
+    .detail-row {
+        display: flex;
+        margin-bottom: 16px;
+        gap: 12px;
+    }
+    .detail-label {
+        min-width: 120px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #7E93A7;
+        padding-top: 2px;
+    }
+    .detail-value {
+        flex: 1;
+        color: #E8EDF2;
+        font-size: 14px;
+        word-break: break-word;
+    }
+    .scan-result-box {
+        background: #0D1420;
+        border: 1px solid #263444;
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 13px;
+        color: #A9B9C7;
+        white-space: pre-wrap;
+        max-height: 280px;
+        overflow-y: auto;
+        line-height: 1.5;
+    }
+    .view-btn {
+        background: #3FC7B01a;
+        border: 1px solid #3FC7B040;
+        color: #3FC7B0;
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .view-btn:hover {
+        background: #3FC7B033;
+        border-color: #3FC7B0;
+    }
 </style>
 
 <div style="min-height:85vh; width:100%; padding:40px 20px; box-sizing:border-box; background-color:#0D1420; font-family:'Sora', system-ui, sans-serif;">
@@ -64,6 +161,7 @@
                         <th>Status</th>
                         <th>Scan Result</th>
                         <th>Date</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -82,14 +180,26 @@
                                 <span style="display:inline-block; padding:4px 10px; border-radius:20px; font-size:12px; font-weight:600; background-color:#E5484D1a; color:#FF9DA0; border:1px solid #E5484D40;">{{ log.status }}</span>
                             {% endif %}
                         </td>
-                        <td style="color:#A9B9C7; max-width:280px;" title="{{ log.scanresult }}">
-                            {{ log.scanresult|truncatechars:70 }}
+                        <td style="color:#A9B9C7; max-width:220px;" title="{{ log.scanresult }}">
+                            {{ log.scanresult|truncatechars:50 }}
                         </td>
                         <td style="color:#7E93A7; white-space:nowrap;">{{ log.timestamp|date:"d M Y, H:i" }}</td>
+                        <td>
+                            <button type="button"
+                                class="view-btn"
+                                data-user="{{ log.USER.name }}"
+                                data-username="{{ log.USER.LOGIN.username }}"
+                                data-host="{{ log.target_host }}"
+                                data-status="{{ log.status }}"
+                                data-result="{{ log.scanresult|escapejs }}"
+                                data-date="{{ log.timestamp|date:'d M Y, H:i' }}">
+                                View
+                            </button>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="6" style="text-align:center; padding:50px; color:#7E93A7;">No network scan logs found.</td>
+                        <td colspan="7" style="text-align:center; padding:50px; color:#7E93A7;">No network scan logs found.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -98,16 +208,52 @@
     </div>
 </div>
 
+<!-- Details Modal -->
+<div class="modal-overlay" id="detailsModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Scan Details</h3>
+            <button type="button" class="modal-close" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-row">
+                <div class="detail-label">User</div>
+                <div class="detail-value" id="modalUser"></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Target Host</div>
+                <div class="detail-value" id="modalHost"></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Status</div>
+                <div class="detail-value" id="modalStatus"></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Date</div>
+                <div class="detail-value" id="modalDate"></div>
+            </div>
+            <div class="detail-row" style="flex-direction:column; gap:8px;">
+                <div class="detail-label">Scan Result</div>
+                <div class="scan-result-box" id="modalResult"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // DataTable
     try {
         if ($.fn.DataTable) {
             $('#networkTable').DataTable({
                 pageLength: 10,
                 lengthMenu: [5, 10, 25, 50],
                 order: [[0, 'asc']],
+                columnDefs: [
+                    { orderable: false, targets: 6 }  // Action column
+                ],
                 language: {
                     search: "Search:",
                     lengthMenu: "Show _MENU_ entries",
@@ -117,6 +263,42 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     } catch (e) { console.log(e); }
+
+    // Modal logic
+    const modal = document.getElementById('detailsModal');
+    const closeBtn = document.getElementById('closeModal');
+
+    function openModal(btn) {
+        document.getElementById('modalUser').textContent =
+            btn.dataset.user + ' (@' + btn.dataset.username + ')';
+        document.getElementById('modalHost').textContent = btn.dataset.host;
+        document.getElementById('modalDate').textContent = btn.dataset.date;
+
+        // Status badge
+        const status = btn.dataset.status || '';
+        const statusEl = document.getElementById('modalStatus');
+        const isSuccess = status.toLowerCase() === 'completed' || status.toLowerCase() === 'success';
+        statusEl.innerHTML = isSuccess
+            ? `<span style="display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;background-color:#3FC7B01a;color:#3FC7B0;border:1px solid #3FC7B040;">${status}</span>`
+            : `<span style="display:inline-block;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;background-color:#E5484D1a;color:#FF9DA0;border:1px solid #E5484D40;">${status}</span>`;
+
+        document.getElementById('modalResult').textContent = btn.dataset.result || '—';
+        modal.classList.add('active');
+    }
+
+    // Event delegation (works with DataTables pagination/search)
+    document.getElementById('networkTable').addEventListener('click', function (e) {
+        const btn = e.target.closest('.view-btn');
+        if (btn) openModal(btn);
+    });
+
+    closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') modal.classList.remove('active');
+    });
 });
 </script>
 

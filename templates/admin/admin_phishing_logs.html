@@ -85,7 +85,7 @@
     }
 
     .url-cell {
-        max-width: 280px;
+        max-width: 240px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -121,6 +121,103 @@
         background-color: #3FC7B01a;
         color: #3FC7B0;
         border: 1px solid #3FC7B040;
+    }
+
+    /* Modal styles */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.65);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal-box {
+        background: #141E2B;
+        border: 1px solid #263444;
+        border-radius: 14px;
+        width: 100%;
+        max-width: 680px;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        font-family: 'Sora', system-ui, sans-serif;
+    }
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 18px 22px;
+        border-bottom: 1px solid #263444;
+    }
+    .modal-header h3 {
+        margin: 0;
+        font-size: 17px;
+        font-weight: 600;
+        color: #E8EDF2;
+    }
+    .modal-close {
+        background: transparent;
+        border: none;
+        color: #7E93A7;
+        font-size: 22px;
+        cursor: pointer;
+        line-height: 1;
+        padding: 4px 8px;
+        border-radius: 6px;
+    }
+    .modal-close:hover { background: #1A2535; color: #E8EDF2; }
+    .modal-body { padding: 22px; }
+    .detail-row {
+        display: flex;
+        margin-bottom: 16px;
+        gap: 12px;
+    }
+    .detail-label {
+        min-width: 120px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: #7E93A7;
+        padding-top: 2px;
+    }
+    .detail-value {
+        flex: 1;
+        color: #E8EDF2;
+        font-size: 14px;
+        word-break: break-word;
+    }
+    .result-box {
+        background: #0D1420;
+        border: 1px solid #263444;
+        border-radius: 10px;
+        padding: 14px 16px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: 13px;
+        color: #A9B9C7;
+        white-space: pre-wrap;
+        max-height: 240px;
+        overflow-y: auto;
+        line-height: 1.5;
+    }
+    .view-btn {
+        background: #3FC7B01a;
+        border: 1px solid #3FC7B040;
+        color: #3FC7B0;
+        padding: 5px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+    .view-btn:hover {
+        background: #3FC7B033;
+        border-color: #3FC7B0;
     }
 </style>
 
@@ -220,7 +317,6 @@
                    style="width:100%;">
 
                 <thead>
-
                     <tr>
                         <th>#</th>
                         <th>User</th>
@@ -228,132 +324,117 @@
                         <th>Probability</th>
                         <th>Prediction</th>
                         <th>Date</th>
+                        <th>Action</th>
                     </tr>
-
                 </thead>
 
-
                 <tbody>
-
                     {% for log in logs %}
-
                     <tr>
-
-                        <!-- SERIAL NUMBER -->
                         <td style="color:#7E93A7;">
                             {{ forloop.counter }}
                         </td>
 
-
-                        <!-- USER -->
-                        <td style="
-                            color:#E8EDF2;
-                            font-weight:500;
-                        ">
-
+                        <td style="color:#E8EDF2; font-weight:500;">
                             {{ log.USER.name }}
-
                             <br>
-
                             <small style="color:#7E93A7;">
                                 {{ log.USER.LOGIN.username }}
                             </small>
-
                         </td>
 
-
-                        <!-- URL -->
                         <td class="url-cell"
                             title="{{ log.url }}"
                             style="color:#E8EDF2;">
-
-                            {{ log.url|truncatechars:45 }}
-
+                            {{ log.url|truncatechars:40 }}
                         </td>
 
-
-                        <!-- PROBABILITY -->
                         <td>
-
                             {% if log.probability >= 0.70 %}
-
                                 <span class="confidence-danger">
                                     {{ log.probability|floatformat:2 }}
                                 </span>
-
                             {% else %}
-
                                 <span class="confidence-safe">
                                     {{ log.probability|floatformat:2 }}
                                 </span>
-
                             {% endif %}
-
                         </td>
 
-
-                        <!-- PREDICTION -->
                         <td>
-
                             {% if 'phish' in log.result|lower or 'malicious' in log.result|lower or 'danger' in log.result|lower %}
-
                                 <span class="prediction-danger">
                                     {{ log.result|truncatechars:25 }}
                                 </span>
-
                             {% else %}
-
                                 <span class="prediction-safe">
                                     {{ log.result|truncatechars:25 }}
                                 </span>
-
                             {% endif %}
-
                         </td>
 
-
-                        <!-- DATE -->
-                        <td style="
-                            color:#7E93A7;
-                            white-space:nowrap;
-                        ">
-
+                        <td style="color:#7E93A7; white-space:nowrap;">
                             {{ log.created_at|date:"d M Y, H:i" }}
-
                         </td>
 
+                        <td>
+                            <button type="button"
+                                class="view-btn"
+                                data-user="{{ log.USER.name }}"
+                                data-username="{{ log.USER.LOGIN.username }}"
+                                data-url="{{ log.url|escapejs }}"
+                                data-probability="{{ log.probability|floatformat:4 }}"
+                                data-result="{{ log.result|escapejs }}"
+                                data-date="{{ log.created_at|date:'d M Y, H:i' }}">
+                                View
+                            </button>
+                        </td>
                     </tr>
-
-
                     {% empty %}
-
                     <tr>
-
-                        <td colspan="6"
-                            style="
-                                text-align:center;
-                                padding:50px;
-                                color:#7E93A7;
-                            ">
-
+                        <td colspan="7"
+                            style="text-align:center; padding:50px; color:#7E93A7;">
                             No phishing detection logs found.
-
                         </td>
-
                     </tr>
-
                     {% endfor %}
-
                 </tbody>
-
             </table>
-
         </div>
-
     </div>
-
 </div>
 
+<!-- Details Modal -->
+<div class="modal-overlay" id="detailsModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Phishing Detection Details</h3>
+            <button type="button" class="modal-close" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="detail-row">
+                <div class="detail-label">User</div>
+                <div class="detail-value" id="modalUser"></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">URL</div>
+                <div class="detail-value" id="modalUrl"></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Probability</div>
+                <div class="detail-value" id="modalProbability"></div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">Date</div>
+                <div class="detail-value" id="modalDate"></div>
+            </div>
+            <div class="detail-row" style="flex-direction:column; gap:8px;">
+                <div class="detail-label">Prediction Result</div>
+                <div class="result-box" id="modalResult"></div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- JQUERY -->
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -361,50 +442,83 @@
 <!-- DATATABLE -->
 <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
 
-
 <script>
-
 document.addEventListener('DOMContentLoaded', function () {
 
     try {
-
         if ($.fn.DataTable) {
-
             $('#phishingTable').DataTable({
-
                 pageLength: 10,
-
                 lengthMenu: [5, 10, 25, 50],
-
                 order: [[0, 'asc']],
-
+                columnDefs: [
+                    { orderable: false, targets: 6 }  // Action column
+                ],
                 language: {
-
                     search: "Search:",
-
                     lengthMenu: "Show _MENU_ entries",
-
                     info: "Showing _START_ to _END_ of _TOTAL_ logs",
-
                     zeroRecords: "No matching logs found"
-
                 }
-
             });
+        }
+    } catch (e) {
+        console.log(e);
+    }
 
+    // Modal logic
+    const modal = document.getElementById('detailsModal');
+    const closeBtn = document.getElementById('closeModal');
+
+    function openModal(btn) {
+        document.getElementById('modalUser').textContent =
+            btn.dataset.user + ' (@' + btn.dataset.username + ')';
+
+        document.getElementById('modalUrl').textContent = btn.dataset.url || '—';
+        document.getElementById('modalDate').textContent = btn.dataset.date || '—';
+
+        // Probability with color
+        const prob = parseFloat(btn.dataset.probability) || 0;
+        const probEl = document.getElementById('modalProbability');
+        if (prob >= 0.70) {
+            probEl.innerHTML = `<span class="confidence-danger">${prob.toFixed(4)}</span>`;
+        } else {
+            probEl.innerHTML = `<span class="confidence-safe">${prob.toFixed(4)}</span>`;
         }
 
+        // Result with badge
+        const result = btn.dataset.result || '—';
+        const resultLower = result.toLowerCase();
+        const isDanger = resultLower.includes('phish') || resultLower.includes('malicious') || resultLower.includes('danger');
+        const resultEl = document.getElementById('modalResult');
+
+        if (isDanger) {
+            resultEl.innerHTML = `<span class="prediction-danger" style="margin-bottom:10px;">${result}</span>`;
+        } else {
+            resultEl.innerHTML = `<span class="prediction-safe" style="margin-bottom:10px;">${result}</span>`;
+        }
+
+        if (result.length > 40) {
+            resultEl.innerHTML += `<div style="margin-top:8px;white-space:pre-wrap;">${result}</div>`;
+        }
+
+        modal.classList.add('active');
     }
 
-    catch (e) {
+    // Event delegation (works with DataTables pagination/search)
+    document.getElementById('phishingTable').addEventListener('click', function (e) {
+        const btn = e.target.closest('.view-btn');
+        if (btn) openModal(btn);
+    });
 
-        console.log(e);
-
-    }
-
+    closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('active');
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') modal.classList.remove('active');
+    });
 });
-
 </script>
-
 
 {% endblock %}

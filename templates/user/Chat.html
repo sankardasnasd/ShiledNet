@@ -77,7 +77,7 @@ content: "";
 <!--				</div></div>-->
 
 				<div class="col-md-8 col-xl-6 chat">
-												<a href="/tutorviewparent" style="color: white">Go to Home</a>
+												<a href="/myapp/all-users/#a" style="color: white">Go to Home</a>
 
 					<div class="card">
 						<div class="card-header msg_head">
@@ -400,7 +400,7 @@ content: "";
 repeatEverySecond();
 $.ajax({
 {#            url: "/coinup/chat_view{{ toid }}",#}
-            url: "/chat_view",
+            url: "/myapp/chat_view/",
             type: "GET",
             data: {
 
@@ -471,7 +471,7 @@ $.ajax({
 
 $.ajax({
 {#            url: "/coinup/chat_view{{ toid }}",#}
-            url: "/chat_view",
+            url: "/myapp/chat_view/",
             type: "GET",
             data: {
 
@@ -549,7 +549,7 @@ $.ajax({
 
   $.ajax({
 {#            url: "/coinup/chat_send/"+msg+"/"+{{ toid }},#}
-            url: "/chat_send/"+msg,
+            url: "/myapp/chat_send/"+msg,
             type: "GET",
             data: {
 

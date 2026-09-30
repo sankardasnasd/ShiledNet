@@ -477,6 +477,7 @@
         <a href="/myapp/view_apk_reports/#a">APK Malware</a>
         <a href="/myapp/phishing-check/#a">Phishing Scan</a>
         <a href="/myapp/network_scan/#a">Network Scan</a>
+        <a href="/myapp/all-users/#a">All Users</a>
         <a href="/myapp/user_view_and_sent_complaints/#a">Complaints</a>
         <a href="/myapp/user_view_and_send_feedback/#a">Feedback</a>
       </nav>
@@ -488,199 +489,15 @@
   </header>
 
   <main>
-    <section class="hero">
-      <div class="container hero-grid">
-        <div>
-          <div class="pill">
-            <span class="dot"></span>
-            Welcome{% if user_profile %}, {{ user_profile.name }}{% endif %}
-          </div>
 
-          <h1>
-            Your security <span class="gradient-text">overview</span>
-          </h1>
-
-          <p>
-            Monitor your network scans, phishing checks, and APK analysis results
-            from one private dashboard. All data is visible only to you.
-          </p>
-
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="/myapp/network_scan/#a">New Network Scan</a>
-            <a class="btn btn-outline" href="/myapp/phishing-check/#a">Check URL</a>
-          </div>
-
-          <div class="hero-stats">
-            <div class="stat">
-              <strong>{{ total_scans }}</strong>
-              <span>Network scans</span>
-            </div>
-            <div class="stat">
-              <strong>{{ total_phishing }}</strong>
-              <span>Phishing checks</span>
-            </div>
-            <div class="stat">
-              <strong>{{ total_apks }}</strong>
-              <span>APK analyses</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- LIVE DASHBOARD (your data only) -->
-        <div class="dashboard">
-          <div class="dashboard-top">
-            <h3>My Security Dashboard</h3>
-            <span class="status">SYSTEM PROTECTED</span>
-          </div>
-
-          <div class="dashboard-grid">
-            <div class="mini-card">
-              <span>Network Scan</span>
-              <strong>{{ open_ports }} Open Ports</strong>
-            </div>
-
-            <div class="mini-card">
-              <span>Network Status</span>
-              <strong class="{% if network_status == 'Suspicious' %}warn{% else %}safe{% endif %}">
-                {{ network_status }}
-              </strong>
-            </div>
-
-            <div class="mini-card">
-              <span>Phishing URL Check</span>
-              <strong class="{% if phishing_status == 'PHISHING' %}bad{% else %}safe{% endif %}">
-                {{ phishing_status }}
-              </strong>
-            </div>
-
-            <div class="mini-card">
-              <span>APK Verdict</span>
-              <strong class="{% if apk_verdict == 'Critical Malware' %}bad{% elif apk_verdict == 'Suspicious' %}warn{% else %}safe{% endif %}">
-                {{ apk_verdict }}
-              </strong>
-            </div>
-
-            <div class="mini-card">
-              <span>Request Rate</span>
-              <strong class="{% if 'Attack' in request_rate_status %}bad{% elif 'Elevated' in request_rate_status %}warn{% else %}safe{% endif %}">
-                {{ request_rate_status }}
-              </strong>
-            </div>
-
-            <div class="mini-card">
-              <span>Sandbox Status</span>
-              <strong class="safe">{{ sandbox_status }}</strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div id="a" class="container">
+    <div id="a" class="container py-5 my-5">
       {% block body %}
       {% endblock %}
     </div>
 
-    <section id="features">
-      <div class="container">
-        <div class="section-head">
-          <h2>Your security tools</h2>
-          <p>
-            Run network scans, check suspicious URLs, and analyze APK files —
-            all results stay private to your account.
-          </p>
-        </div>
 
-        <div class="features">
-          <article class="feature">
-            <div class="icon">📡</div>
-            <h3>Nmap Network Monitoring</h3>
-            <p>
-              Scan authorized targets to identify live hosts, open ports, running services,
-              and potentially suspicious exposure.
-            </p>
-          </article>
 
-          <article class="feature">
-            <div class="icon">🛡️</div>
-            <h3>DoS Attack Detection</h3>
-            <p>
-              Your request patterns are monitored. Abnormal volume triggers
-              alerts and automatic protection.
-            </p>
-          </article>
 
-          <article class="feature">
-            <div class="icon">🔗</div>
-            <h3>Phishing URL Detection</h3>
-            <p>
-              Submit any URL for machine-learning classification as phishing or legitimate.
-            </p>
-          </article>
-
-          <article class="feature">
-            <div class="icon">📱</div>
-            <h3>APK Malware Analysis</h3>
-            <p>
-              Upload Android apps for static, sandbox, and ML analysis to receive a safe or harmful verdict.
-            </p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="workflow" style="background: rgba(255,255,255,0.015);">
-      <div class="container">
-        <div class="section-head">
-          <h2>How it works for you</h2>
-          <p>
-            Every analysis keeps untrusted files and suspicious targets away from the production server.
-          </p>
-        </div>
-
-        <div class="workflow">
-          <article class="step">
-            <div class="step-number">STEP 01</div>
-            <h3>Login</h3>
-            <p>Access your private ShieldNet dashboard securely.</p>
-          </article>
-
-          <article class="step">
-            <div class="step-number">STEP 02</div>
-            <h3>Run Checks</h3>
-            <p>Perform Nmap scans, check URLs, or upload APK files.</p>
-          </article>
-
-          <article class="step">
-            <div class="step-number">STEP 03</div>
-            <h3>Analyze Safely</h3>
-            <p>Uploads are inspected inside a disposable sandbox.</p>
-          </article>
-
-          <article class="step">
-            <div class="step-number">STEP 04</div>
-            <h3>View Results</h3>
-            <p>See scan results, phishing verdicts, and malware status.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section>
-      <div class="container">
-        <div class="cta">
-          <h2>Ready to run a new check?</h2>
-          <p>
-            Start a network scan, check a suspicious URL, or upload an APK for analysis.
-          </p>
-          <div class="hero-actions" style="justify-content:center;">
-            <a class="btn btn-light" href="/myapp/network_scan/#a">Network Scan</a>
-            <a class="btn btn-outline" href="/myapp/phishing-check/#a">Phishing Check</a>
-            <a class="btn btn-outline" href="/myapp/view_apk_reports/#a">APK Analysis</a>
-          </div>
-        </div>
-      </div>
-    </section>
   </main>
 
   <footer>
