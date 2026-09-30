@@ -217,7 +217,6 @@ class DynamicSandboxEngine:
         sha256_hash = hashlib.sha256(file_bytes).hexdigest()
         sha1_hash = hashlib.sha1(file_bytes).hexdigest()
 
-        # വലിയ ഫയലുകളിൽ സ്കാനിംഗ് വേഗത്തിലാക്കാൻ സാമ്പിൾ ബൈറ്റുകൾ ഉപയോഗിക്കുന്നു
         scan_sample = file_bytes[:2 * 1024 * 1024]
         entropy = cls.calculate_entropy(scan_sample)
 
